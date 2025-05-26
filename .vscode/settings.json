@@ -3,5 +3,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "files.autoSave": "onWindowChange",
-  "cSpell.language": "en, es"
+  "css.lint.unknownAtRules": "ignore",
+  "cSpell.language": "en, es",
+  "cSpell.words": ["tailwindcss"]
 }
