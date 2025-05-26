@@ -11,13 +11,11 @@ const AboutComponent: FC = () => {
 
   const openModal = () => {
     setIsModalOpen(true);
-    // Prevenir scroll cuando el modal está abierto
     document.body.style.overflow = "hidden";
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    // Pausar el video cuando se cierra el modal
     if (videoRef.current) {
       videoRef.current.pause();
     }
