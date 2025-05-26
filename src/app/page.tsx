@@ -10,8 +10,11 @@ const Home: FC = () => {
   return (
     <>
       <HomeComponent />
+      {/* TODO: cuerda */}
       <AboutComponent />
+      {/* TODO: cuerda */}
       <ClassComponent />
+      {/* TODO: cuerda */}
       <TrainersComponent />
       <PricingComponent />
       <CallComponent />
