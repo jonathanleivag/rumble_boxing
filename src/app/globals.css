@@ -1,11 +1,155 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Font families */
+  --font-bebas-neue: var(--font-bebas-neue);
+  --font-oswald: var(--font-oswald);
+  --font-montserrat: var(--font-montserrat);
+
+  --background: #0f0f0f;
+  --foreground: #ffffff;
+
+  --primary: #e02020;
+  --primary-dark: #c01818;
+
+  --secondary: #1a56db;
+  --secondary-dark: #0f3fa0;
+
+  --accent-light: #f0f0f0;
+  --accent-medium: #c0c0c0;
+  --accent-dark: #303030;
 }
 
 @theme inline {
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-dark: var(--secondary-dark);
+
+  --color-accent-light: var(--accent-light);
+  --color-accent-medium: var(--accent-medium);
+  --color-accent-dark: var(--accent-dark);
+
+  /* Fonts */
+  --font-heading: var(--font-bebas-neue);
+  --font-subheading: var(--font-oswald);
+  --font-body: var(--font-montserrat);
+}
+
+/* Boxing Gym Font Utility Classes */
+
+/* Headline Font - Bebas Neue */
+.font-bebas {
+  font-family: var(--font-bebas-neue);
+}
+
+/* Subheading Font - Oswald */
+.font-oswald {
+  font-family: var(--font-oswald);
+}
+
+/* Body Font - Montserrat */
+.font-montserrat {
+  font-family: var(--font-montserrat);
+}
+
+/* Typography Styles */
+h1,
+.h1 {
+  font-family: var(--font-bebas-neue);
+  font-size: 3.5rem;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+h2,
+.h2 {
+  font-family: var(--font-bebas-neue);
+  font-size: 2.5rem;
+  line-height: 1.1;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+h3,
+.h3 {
+  font-family: var(--font-oswald);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+h4,
+.h4 {
+  font-family: var(--font-oswald);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* Fighting-inspired text styles */
+.text-knockout {
+  font-family: var(--font-bebas-neue);
+  font-size: 4rem;
+  line-height: 0.9;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 var(--primary);
+}
+
+.text-punch {
+  position: relative;
+  font-family: var(--font-bebas-neue);
+  display: inline-block;
+  color: var(--foreground);
+  background-color: var(--primary);
+  padding: 0.25rem 0.75rem;
+  transform: rotate(-2deg);
+}
+
+.text-banner {
+  font-family: var(--font-oswald);
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: var(--secondary);
+  color: var(--foreground);
+  padding: 0.25rem 0.5rem;
+  display: inline-block;
+}
+
+/* Text shadow classes for better readability over video backgrounds */
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.text-shadow-md {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Animación personalizada para el logo en el hero */
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.02);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
 }

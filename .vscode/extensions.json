@@ -2,7 +2,6 @@
   "recommendations": [
     "ms-vscode.vscode-typescript-next",
     "apollographql.vscode-apollo",
-    "biomejs.biome",
     "streetsidesoftware.code-spell-checker",
     "mikestead.dotenv",
     "IronGeek.vscode-env",
