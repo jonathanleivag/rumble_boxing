@@ -5,17 +5,18 @@ import ClassComponent from "@/components/home/class.component";
 import TrainersComponent from "@/components/home/trainers.component";
 import PricingComponent from "@/components/home/pricing.component";
 import CallComponent from "@/components/home/call.component";
+import CuerdaSharedComponent from "@/components/shared/cuerda.shared.component";
 
 const Home: FC = () => {
   return (
     <>
       <HomeComponent />
-      {/* TODO: cuerda */}
       <AboutComponent />
-      {/* TODO: cuerda */}
+      <CuerdaSharedComponent src="/cuerda.webp" />
       <ClassComponent />
-      {/* TODO: cuerda */}
+      <CuerdaSharedComponent src="/cuerda2.webp" />
       <TrainersComponent />
+      <CuerdaSharedComponent src="/cuerda3.webp" />
       <PricingComponent />
       <CallComponent />
     </>
