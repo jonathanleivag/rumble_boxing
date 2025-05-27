@@ -1,10 +1,20 @@
 "use client";
 
+import { env } from "@/lib/env";
 import { fadeInUp, staggerContainer } from "@/utils/motionEffect.util";
-import { motion } from "framer-motion";
-import { FC } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { FC, useState } from "react";
+import VideoShareModal from "../shared/videoModal.shared.component";
 
 const CallComponent: FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    document.body.style.overflow = "hidden";
+  };
+
   return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/5 to-[#0f0f0f]/90">
@@ -51,11 +61,17 @@ const CallComponent: FC = () => {
             variants={fadeInUp}
             className="flex flex-col sm:flex-row justify-center gap-4"
           >
-            <button className="bg-primary hover:bg-primary-dark transition-all duration-300 font-oswald text-xl uppercase tracking-wider py-4 px-10 rounded-full text-white shadow-xl shadow-primary/20 hover:shadow-primary/40 transform hover:translate-y-[-2px]">
+            <Link
+              href={`https://wa.me/${
+                env.NEXT_PUBLIC_PHONE
+              }?text=${encodeURIComponent(env.NEXT_PUBLIC_MESSAGE)}`}
+              target="_blank"
+              className="bg-primary hover:bg-primary-dark transition-all duration-300 font-oswald text-xl uppercase tracking-wider py-4 px-10 rounded-full text-white shadow-xl shadow-primary/20 hover:shadow-primary/40 transform hover:translate-y-[-2px]"
+            >
               PROGRAMA TU CLASE GRATIS
-            </button>
-            <a
-              href="#"
+            </Link>
+            <button
+              onClick={openModal}
               className="inline-flex items-center justify-center gap-2 font-oswald text-white hover:text-primary transition-colors"
             >
               <svg
@@ -77,9 +93,13 @@ const CallComponent: FC = () => {
                 <path d="M10 8L16 12L10 16V8Z" fill="currentColor" />
               </svg>
               <span>VER VIDEO INTRODUCTORIO</span>
-            </a>
+            </button>
           </motion.div>
         </div>
+
+        <AnimatePresence>
+          {isModalOpen && <VideoShareModal setIsModalOpen={setIsModalOpen} />}
+        </AnimatePresence>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

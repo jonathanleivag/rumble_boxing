@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Dispatch, SetStateAction } from "react";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -6,4 +6,8 @@ export interface ChildrenProps {
 
 export interface CuerdaSharedComponentProps {
   src: string;
+}
+
+export interface VideoShareModalProps {
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }

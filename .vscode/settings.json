@@ -5,5 +5,12 @@
   "files.autoSave": "onWindowChange",
   "css.lint.unknownAtRules": "ignore",
   "cSpell.language": "en, es",
-  "cSpell.words": ["HIIT", "INSCRÍBETE", "saturday", "tailwindcss", "whatsapp"]
+  "cSpell.words": [
+    "HIIT",
+    "INSCRÍBETE",
+    "nodownload",
+    "saturday",
+    "tailwindcss",
+    "whatsapp"
+  ]
 }
