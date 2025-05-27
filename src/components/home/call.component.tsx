@@ -7,14 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 import VideoShareModal from "../shared/videoModal.shared.component";
+import { Testimonial } from "@/type";
 
-interface Testimonial {
-  id: number;
-  name: string;
-  quote: string;
-  duration: string;
-  image?: string;
-}
+
 
 const testimonials: Testimonial[] = [
   {

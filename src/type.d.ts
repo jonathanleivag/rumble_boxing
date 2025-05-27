@@ -11,3 +11,11 @@ export interface CuerdaSharedComponentProps {
 export interface VideoShareModalProps {
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
+
+export interface Testimonial {
+  id: number;
+  name: string;
+  quote: string;
+  duration: string;
+  image?: string;
+}
