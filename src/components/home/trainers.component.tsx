@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { FC } from "react";
 import Image from "next/image";
-import SocialSharedComponent from "../shared/social.shared.component";
 
 const TrainersComponent: FC = () => {
   return (
