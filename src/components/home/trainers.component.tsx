@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion";
 import { FC } from "react";
+import Image from "next/image";
+import SocialSharedComponent from "../shared/social.shared.component";
 
 const TrainersComponent: FC = () => {
   return (
@@ -14,7 +16,6 @@ const TrainersComponent: FC = () => {
 
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Left side: Image and decorative elements */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -23,55 +24,31 @@ const TrainersComponent: FC = () => {
             className="relative"
           >
             <div className="aspect-[4/5] bg-accent-medium relative overflow-hidden rounded-3xl z-10">
-              {/* Trainer image would go here */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/80 via-black/40 to-transparent">
-                <p className="text-accent-dark font-bebas text-xl">
-                  [FOTO ENTRENADOR]
-                </p>
-              </div>
+              <Image
+                src="/alejandro.webp"
+                alt="Alejandro Lupcke - Entrenador Federado de Boxeo Profesional"
+                fill
+                priority
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
 
-              {/* Trainer name overlay at bottom */}
               <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
                 <h3 className="font-bebas text-4xl text-white mb-1 tracking-wider">
-                  CARLOS <span className="text-primary">MENDOZA</span>
+                  ALEJANDRO <span className="text-primary">Lupcke</span>
                 </h3>
                 <p className="font-oswald text-white/90 text-sm inline-block border-b border-primary pb-1">
-                  HEAD COACH & EX-CAMPEÓN NACIONAL
+                  Entrenador Federado de Boxeo Profesional
                 </p>
               </div>
             </div>
 
             <div className="absolute -bottom-6 -left-6 w-24 h-24 border-2 border-primary rounded-full z-0 opacity-50"></div>
             <div className="absolute -top-6 -right-6 w-32 h-32 border border-primary/30 rounded-full z-0"></div>
-
-            <div className="flex mt-8 justify-center gap-4">
-              <motion.a
-                whileHover={{ y: -3, backgroundColor: "#e11d48" }}
-                href="#"
-                className="w-12 h-12 rounded-full bg-accent-dark/50 backdrop-blur-sm flex items-center justify-center transition-all duration-300 shadow-lg"
-              >
-                <span className="text-white text-sm">IG</span>
-              </motion.a>
-              <motion.a
-                whileHover={{ y: -3, backgroundColor: "#e11d48" }}
-                href="#"
-                className="w-12 h-12 rounded-full bg-accent-dark/50 backdrop-blur-sm flex items-center justify-center transition-all duration-300 shadow-lg"
-              >
-                <span className="text-white text-sm">FB</span>
-              </motion.a>
-              <motion.a
-                whileHover={{ y: -3, backgroundColor: "#e11d48" }}
-                href="#"
-                className="w-12 h-12 rounded-full bg-accent-dark/50 backdrop-blur-sm flex items-center justify-center transition-all duration-300 shadow-lg"
-              >
-                <span className="text-white text-sm">YT</span>
-              </motion.a>
-            </div>
           </motion.div>
 
-          {/* Right side: Info and stats */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -95,7 +72,6 @@ const TrainersComponent: FC = () => {
               nuestros miembros.
             </p>
 
-            {/* Stats with modern design */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="col-span-2 relative overflow-hidden bg-gradient-to-r from-primary/20 to-black/40 p-6 rounded-2xl backdrop-blur-sm border border-primary/20 mb-2">
                 <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/10 blur-xl"></div>
@@ -137,16 +113,14 @@ const TrainersComponent: FC = () => {
               </div>
               <div className="relative overflow-hidden bg-gradient-to-br from-accent-dark/40 to-black/40 p-6 rounded-2xl backdrop-blur-sm border border-accent-dark/10">
                 <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-primary/10 blur-xl"></div>
-                <div className="text-primary font-bebas text-4xl mb-1">
-                  200+
-                </div>
+                <div className="text-primary font-bebas text-4xl mb-1">60+</div>
                 <div className="text-white/70 font-oswald text-sm tracking-wide">
                   ALUMNOS ENTRENADOS
                 </div>
               </div>
               <div className="relative overflow-hidden bg-gradient-to-br from-accent-dark/40 to-black/40 p-6 rounded-2xl backdrop-blur-sm border border-accent-dark/10">
                 <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-primary/10 blur-xl"></div>
-                <div className="text-primary font-bebas text-4xl mb-1">5</div>
+                <div className="text-primary font-bebas text-4xl mb-1">12</div>
                 <div className="text-white/70 font-oswald text-sm tracking-wide">
                   CERTIFICACIONES
                 </div>
@@ -160,7 +134,6 @@ const TrainersComponent: FC = () => {
               </div>
             </div>
 
-            {/* Quote */}
             <div className="bg-gradient-to-r from-primary/10 to-transparent border-l-4 border-primary p-6 rounded-r-2xl">
               <p className="text-white/80 font-montserrat italic text-sm leading-relaxed">
                 &ldquo;El boxeo no solo es sobre golpear, es sobre disciplina,

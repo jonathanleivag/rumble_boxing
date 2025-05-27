@@ -51,7 +51,7 @@ const AboutComponent: FC = () => {
           <div className="flex gap-6 mb-8">
             <div className="bg-gradient-to-br from-accent-dark to-accent-dark/50 p-6 rounded-2xl flex-1 backdrop-blur-sm border border-accent-dark/50 hover:border-primary/30 transition-all duration-300 transform hover:-translate-y-1">
               <h4 className="font-oswald text-2xl mb-2 text-primary">
-                +10 AÑOS
+                +15 AÑOS
               </h4>
               <p className="font-montserrat text-accent-medium">
                 De experiencia
