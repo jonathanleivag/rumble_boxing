@@ -238,23 +238,25 @@ const Navbar: FC = () => {
                 />
               )}
             </Link>
-            <Link
-              href="#"
-              className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group"
-            >
-              <span className="relative z-10">Reservar Clase</span>
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-[#e02020] to-[#ff4d4d] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                animate={{
-                  x: ["0%", "100%", "0%"],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-            </Link>
+            <div className="flex items-center space-x-3">
+              <Link
+                href="#"
+                className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group"
+              >
+                <span className="relative z-10">Reservar Clase</span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-[#e02020] to-[#ff4d4d] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  animate={{
+                    x: ["0%", "100%", "0%"],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+              </Link>
+            </div>
           </nav>
 
           <button

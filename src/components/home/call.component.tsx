@@ -8,8 +8,8 @@ import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 import VideoShareModal from "../shared/videoModal.shared.component";
 import { Testimonial } from "@/type";
-
-
+import LoginButton from "../auth/login-button";
+import { signOut, useSession } from "next-auth/react";
 
 const testimonials: Testimonial[] = [
   {
@@ -40,6 +40,7 @@ const CallComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentTestimonial, setCurrentTestimonial] = useState<number>(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
+  const { data: session } = useSession();
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -76,7 +77,10 @@ const CallComponent: FC = () => {
   }, [isAutoPlaying, currentTestimonial]);
 
   return (
-    <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section
+      id="call"
+      className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/5 to-[#0f0f0f]/90">
         <div className="absolute inset-0 bg-[url('/boxing-pattern.svg')] opacity-5 mix-blend-overlay"></div>
       </div>
@@ -330,28 +334,46 @@ const CallComponent: FC = () => {
           </div>
 
           <div className="mt-8 pt-6 border-t border-accent-dark/30 flex justify-center">
-            <button
-              onClick={() => {}}
-              className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-oswald py-3 px-6 rounded-full transition-all duration-300 border border-primary/30 cursor-pointer"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-primary"
-              >
-                <path
-                  d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              COMENTAR
-            </button>
+            {session && (
+              <div className="flex flex-col items-center gap-4">
+                <button
+                  onClick={() => {}}
+                  className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-oswald py-3 px-6 rounded-full transition-all duration-300 border border-primary/30 cursor-pointer"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-primary"
+                  >
+                    <path
+                      d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  COMENTAR
+                </button>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/#call" })}
+                  className="text-primary cursor-pointer"
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+            {!session && (
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-accent-light font-oswald text-sm">
+                  Inicia sesión para comentar y compartir tu experiencia
+                </p>
+                <LoginButton />
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.div>

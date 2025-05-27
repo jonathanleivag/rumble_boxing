@@ -5,6 +5,9 @@ const requiredEnv = [
   "NEXT_PUBLIC_FACEBOOK_USERNAME",
   "NEXT_PUBLIC_PHONE",
   "NEXT_PUBLIC_MESSAGE",
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "NEXTAUTH_SECRET",
 ];
 
 requiredEnv.forEach((envVar) => {
@@ -14,7 +17,9 @@ requiredEnv.forEach((envVar) => {
 });
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ["lh3.googleusercontent.com"],
+  },
 };
 
 export default nextConfig;
