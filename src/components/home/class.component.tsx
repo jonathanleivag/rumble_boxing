@@ -1,6 +1,8 @@
 "use client";
+import { env } from "@/lib/env";
 import { fadeInUp, staggerContainer } from "@/utils/motionEffect.util";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { FC } from "react";
 
 const ClassComponent: FC = () => {
@@ -346,11 +348,15 @@ const ClassComponent: FC = () => {
           </motion.div>
         </motion.div>
 
-        {/* Botón de inscripción */}
         <motion.div variants={fadeInUp} className="flex justify-center mt-12">
-          <button className="font-bebas bg-primary hover:bg-primary-dark px-8 py-4 rounded-full text-white text-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40">
+          <Link
+            href={`https://wa.me/${
+              env.NEXT_PUBLIC_PHONE
+            }?text=${encodeURIComponent(env.NEXT_PUBLIC_MESSAGE)}`}
+            className="font-bebas bg-primary hover:bg-primary-dark px-8 py-4 rounded-full text-white text-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40"
+          >
             INSCRÍBETE A UNA CLASE
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>
