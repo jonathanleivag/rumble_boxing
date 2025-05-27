@@ -19,3 +19,9 @@ export interface Testimonial {
   duration: string;
   image?: string;
 }
+
+export interface CommentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (commentData: { rating: number; comment: string }) => void;
+}

@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 import VideoShareModal from "../shared/videoModal.shared.component";
+import CommentModal from "../shared/commentModal.shared.component";
 import { Testimonial } from "@/type";
 import LoginButton from "../auth/login-button";
 import { signOut, useSession } from "next-auth/react";
@@ -38,13 +39,56 @@ const testimonials: Testimonial[] = [
 
 const CallComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState<boolean>(false);
   const [currentTestimonial, setCurrentTestimonial] = useState<number>(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
+  const [showNotification, setShowNotification] = useState<boolean>(false);
   const { data: session } = useSession();
 
   const openModal = () => {
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
+  };
+
+  const openCommentModal = () => {
+    setIsCommentModalOpen(true);
+  };
+
+  const closeCommentModal = () => {
+    setIsCommentModalOpen(false);
+  };
+
+  const handleCommentSubmit = (commentData: {
+    rating: number;
+    comment: string;
+  }) => {
+    console.log("Comentario enviado:", commentData);
+
+    if (session?.user) {
+      const newTestimonial: Testimonial = {
+        id: testimonials.length + 1,
+        name: session.user.name?.toUpperCase() || "USUARIO",
+        quote: commentData.comment,
+        duration:
+          "Miembro desde " +
+          new Date().toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+        image: session.user.image || undefined,
+      };
+
+      // TODO: Aquí podrías enviar el nuevo testimonio a redux
+
+      console.log({ newTestimonial });
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 5000);
+    }
+
+    closeCommentModal();
   };
 
   const nextTestimonial = () => {
@@ -163,6 +207,16 @@ const CallComponent: FC = () => {
 
         <AnimatePresence>
           {isModalOpen && <VideoShareModal setIsModalOpen={setIsModalOpen} />}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isCommentModalOpen && (
+            <CommentModal
+              isOpen={isCommentModalOpen}
+              onClose={closeCommentModal}
+              onSubmit={handleCommentSubmit}
+            />
+          )}
         </AnimatePresence>
 
         <motion.div
@@ -337,7 +391,7 @@ const CallComponent: FC = () => {
             {session && (
               <div className="flex flex-col items-center gap-4">
                 <button
-                  onClick={() => {}}
+                  onClick={openCommentModal}
                   className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-oswald py-3 px-6 rounded-full transition-all duration-300 border border-primary/30 cursor-pointer"
                 >
                   <svg
@@ -377,6 +431,36 @@ const CallComponent: FC = () => {
           </div>
         </motion.div>
       </motion.div>
+
+      <AnimatePresence>
+        {showNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-5 right-5 bg-gradient-to-r from-green-600 to-green-500 text-white py-3 px-6 rounded-lg shadow-lg z-50 flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            <div>
+              <p className="font-oswald text-sm">¡COMENTARIO ENVIADO!</p>
+              <p className="text-xs">Gracias por compartir tu experiencia</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

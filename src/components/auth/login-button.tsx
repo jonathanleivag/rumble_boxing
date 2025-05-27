@@ -21,7 +21,7 @@ export default function LoginButton() {
   return (
     <button
       onClick={() => signIn("google", { callbackUrl: "/#call" })}
-      className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group"
+      className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group cursor-pointer"
     >
       <span className="relative z-10 flex items-center">
         Iniciar Sesión con Google
