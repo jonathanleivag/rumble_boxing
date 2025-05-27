@@ -350,6 +350,7 @@ const ClassComponent: FC = () => {
 
         <motion.div variants={fadeInUp} className="flex justify-center mt-12">
           <Link
+            target="_blank"
             href={`https://wa.me/${
               env.NEXT_PUBLIC_PHONE
             }?text=${encodeURIComponent(env.NEXT_PUBLIC_MESSAGE)}`}
