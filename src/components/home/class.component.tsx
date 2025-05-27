@@ -4,6 +4,35 @@ import { motion } from "framer-motion";
 import { FC } from "react";
 
 const ClassComponent: FC = () => {
+  const scheduleData = {
+    morning: [
+      { start: "10:00 AM", end: "11:00 AM", class: "Boxeo Básico" },
+      { start: "11:00 AM", end: "12:00 PM", class: "HIIT Boxing" },
+      { start: "12:00 PM", end: "01:00 PM", class: "Sparring Técnico" },
+    ],
+    evening: [
+      { start: "05:00 PM", end: "06:00 PM", class: "Boxeo Básico" },
+      { start: "06:00 PM", end: "07:00 PM", class: "HIIT Boxing" },
+      { start: "07:00 PM", end: "08:00 PM", class: "Sparring Técnico" },
+      { start: "08:00 PM", end: "09:00 PM", class: "Boxeo Básico" },
+    ],
+    saturday: [
+      { start: "10:00 AM", end: "11:00 AM", class: "Boxeo Básico" },
+      { start: "11:00 AM", end: "12:00 PM", class: "HIIT Boxing" },
+      { start: "12:00 PM", end: "01:00 PM", class: "Sparring Técnico" },
+    ],
+    days: [
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+      "Domingo",
+    ],
+    isClosed: [false, false, false, false, false, false, true],
+  };
+
   return (
     <section
       id="classes"
@@ -51,193 +80,276 @@ const ClassComponent: FC = () => {
           whileInView="visible"
           viewport={{ once: true, amount: 0.1 }}
           variants={staggerContainer}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
+          {/* Lunes a Viernes - Horario de mañana */}
           <motion.div
             variants={fadeInUp}
-            whileHover={{ scale: 1.03, y: -5 }}
+            whileHover={{ y: -5 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl overflow-hidden group shadow-lg shadow-black/30 border border-accent-dark/30"
+            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl overflow-hidden shadow-lg shadow-black/30 border border-accent-dark/30"
           >
-            <div className="h-56 bg-accent-medium relative overflow-hidden">
-              {/* Class image would go here */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 to-transparent group-hover:scale-110 transition-transform duration-500">
-                <p className="text-accent-dark font-bebas text-xl">
-                  [IMAGEN BOXEO BÁSICO]
-                </p>
-              </div>
-              <div className="absolute top-4 left-4 bg-primary/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                <span className="text-white font-oswald text-xs">
-                  PRINCIPIANTE
-                </span>
-              </div>
-            </div>
-            <div className="p-8">
-              <h3 className="font-oswald text-2xl mb-3 group-hover:text-primary transition-colors duration-300">
-                BOXEO BÁSICO
+            <div className="p-4 bg-primary/10 border-b border-accent-dark/30">
+              <h3 className="font-oswald text-white text-xl text-center">
+                LUNES A VIERNES
               </h3>
-              <p className="font-montserrat text-accent-medium mb-6 text-sm leading-relaxed">
-                Aprende los fundamentos del boxeo con énfasis en la técnica
-                correcta y movimientos básicos.
+              <p className="text-center text-primary font-oswald text-sm mt-1">
+                MAÑANA
               </p>
-              <div className="flex justify-between items-center">
-                <span className="font-oswald text-primary flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M12 7V12L15 15"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  60 MIN
-                </span>
-                <button className="font-bebas bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-full text-white transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40">
-                  INSCRÍBETE
-                </button>
-              </div>
+            </div>
+            <div className="p-6">
+              {scheduleData.morning.map((timeSlot, index) => (
+                <div
+                  key={index}
+                  className="mb-4 pb-4 border-b border-accent-dark/10 last:border-0 last:mb-0 last:pb-0"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-oswald text-white">
+                      {timeSlot.class}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-primary"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M12 7V12L15 15"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className="font-montserrat text-accent-medium text-sm">
+                        {timeSlot.start} - {timeSlot.end}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
 
           <motion.div
             variants={fadeInUp}
-            whileHover={{ scale: 1.03, y: -5 }}
+            whileHover={{ y: -5 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl overflow-hidden group shadow-lg shadow-black/30 border border-accent-dark/30"
+            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl overflow-hidden shadow-lg shadow-black/30 border border-accent-dark/30"
           >
-            <div className="h-56 bg-accent-medium relative overflow-hidden">
-              {/* Class image would go here */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 to-transparent group-hover:scale-110 transition-transform duration-500">
-                <p className="text-accent-dark font-bebas text-xl">
-                  [IMAGEN HIIT BOXING]
-                </p>
-              </div>
-              <div className="absolute top-4 left-4 bg-accent-dark/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                <span className="text-white font-oswald text-xs">
-                  INTERMEDIO
-                </span>
-              </div>
-            </div>
-            <div className="p-8">
-              <h3 className="font-oswald text-2xl mb-3 group-hover:text-primary transition-colors duration-300">
-                HIIT BOXING
+            <div className="p-4 bg-primary/10 border-b border-accent-dark/30">
+              <h3 className="font-oswald text-white text-xl text-center">
+                LUNES A VIERNES
               </h3>
-              <p className="font-montserrat text-accent-medium mb-6 text-sm leading-relaxed">
-                Entrenamiento de alta intensidad que combina boxeo con
-                ejercicios cardiovasculares para máxima quema.
+              <p className="text-center text-primary font-oswald text-sm mt-1">
+                TARDE
               </p>
-              <div className="flex justify-between items-center">
-                <span className="font-oswald text-primary flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M12 7V12L15 15"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  45 MIN
-                </span>
-                <button className="font-bebas bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-full text-white transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40">
-                  INSCRÍBETE
-                </button>
-              </div>
+            </div>
+            <div className="p-6">
+              {scheduleData.evening.map((timeSlot, index) => (
+                <div
+                  key={index}
+                  className="mb-4 pb-4 border-b border-accent-dark/10 last:border-0 last:mb-0 last:pb-0"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-oswald text-white">
+                      {timeSlot.class}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-primary"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M12 7V12L15 15"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className="font-montserrat text-accent-medium text-sm">
+                        {timeSlot.start} - {timeSlot.end}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
 
           <motion.div
             variants={fadeInUp}
-            whileHover={{ scale: 1.03, y: -5 }}
+            whileHover={{ y: -5 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl overflow-hidden group shadow-lg shadow-black/30 border border-accent-dark/30"
+            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-2xl overflow-hidden shadow-lg shadow-black/30 border border-accent-dark/30"
           >
-            <div className="h-56 bg-accent-medium relative overflow-hidden">
-              {/* Class image would go here */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 to-transparent group-hover:scale-110 transition-transform duration-500">
-                <p className="text-accent-dark font-bebas text-xl">
-                  [IMAGEN SPARRING]
-                </p>
-              </div>
-              <div className="absolute top-4 left-4 bg-secondary/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                <span className="text-white font-oswald text-xs">AVANZADO</span>
-              </div>
-            </div>
-            <div className="p-8">
-              <h3 className="font-oswald text-2xl mb-3 group-hover:text-primary transition-colors duration-300">
-                SPARRING TÉCNICO
+            <div className="p-4 bg-primary/10 border-b border-accent-dark/30">
+              <h3 className="font-oswald text-white text-xl text-center">
+                SÁBADO
               </h3>
-              <p className="font-montserrat text-accent-medium mb-6 text-sm leading-relaxed">
-                Práctica de combate controlado para boxeadores con experiencia
-                que buscan mejorar su técnica.
+              <p className="text-center text-primary font-oswald text-sm mt-1">
+                MAÑANA
               </p>
-              <div className="flex justify-between items-center">
-                <span className="font-oswald text-primary flex items-center gap-2">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      d="M12 7V12L15 15"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  90 MIN
-                </span>
-                <button className="font-bebas bg-primary hover:bg-primary-dark px-5 py-2.5 rounded-full text-white transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40">
-                  INSCRÍBETE
-                </button>
+            </div>
+            <div className="p-6">
+              {scheduleData.saturday.map((timeSlot, index) => (
+                <div
+                  key={index}
+                  className="mb-4 pb-4 border-b border-accent-dark/10 last:border-0 last:mb-0 last:pb-0"
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-oswald text-white">
+                      {timeSlot.class}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-primary"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M12 7V12L15 15"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <span className="font-montserrat text-accent-medium text-sm">
+                        {timeSlot.start} - {timeSlot.end}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeInUp}
+            className="bg-gradient-to-br from-[#1a1a1a]/70 to-[#0f0f0f]/70 rounded-2xl overflow-hidden shadow-lg shadow-black/30 border border-accent-dark/20 md:col-span-3 lg:col-span-3"
+          >
+            <div className="p-8 flex flex-col items-center justify-center">
+              <h3 className="font-oswald text-accent-medium/70 text-xl mb-2">
+                DOMINGO
+              </h3>
+              <div className="bg-accent-dark/30 w-16 h-16 rounded-full flex items-center justify-center mb-3">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-accent-medium/50"
+                >
+                  <path
+                    d="M18 6L6 18M6 6l12 12"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </div>
+              <p className="font-montserrat text-accent-medium/70 text-center">
+                No hay clases programadas para este día.
+                <br />
+                ¡Te esperamos el resto de la semana!
+              </p>
             </div>
           </motion.div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="mt-16 text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={staggerContainer}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12"
         >
-          <button className="font-oswald text-lg uppercase bg-transparent border-2 border-white hover:border-primary hover:text-primary transition-all duration-300 tracking-wider py-3 px-10 rounded-full backdrop-blur-sm">
-            Ver todas las clases
+          <motion.div
+            variants={fadeInUp}
+            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-xl p-4 flex items-center border border-accent-dark/30"
+          >
+            <div className="bg-primary/80 backdrop-blur-sm px-3 py-1 rounded-full mr-3">
+              <span className="text-white font-oswald text-xs">
+                PRINCIPIANTE
+              </span>
+            </div>
+            <div>
+              <h3 className="font-oswald text-lg text-white">BOXEO BÁSICO</h3>
+              <p className="font-montserrat text-accent-medium text-xs">
+                60 minutos • Técnica y fundamentos
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeInUp}
+            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-xl p-4 flex items-center border border-accent-dark/30"
+          >
+            <div className="bg-accent-dark/80 backdrop-blur-sm px-3 py-1 rounded-full mr-3">
+              <span className="text-white font-oswald text-xs">INTERMEDIO</span>
+            </div>
+            <div>
+              <h3 className="font-oswald text-lg text-white">HIIT BOXING</h3>
+              <p className="font-montserrat text-accent-medium text-xs">
+                45 minutos • Alta intensidad
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={fadeInUp}
+            className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-xl p-4 flex items-center border border-accent-dark/30"
+          >
+            <div className="bg-secondary/80 backdrop-blur-sm px-3 py-1 rounded-full mr-3">
+              <span className="text-white font-oswald text-xs">AVANZADO</span>
+            </div>
+            <div>
+              <h3 className="font-oswald text-lg text-white">
+                SPARRING TÉCNICO
+              </h3>
+              <p className="font-montserrat text-accent-medium text-xs">
+                90 minutos • Combate controlado
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Botón de inscripción */}
+        <motion.div variants={fadeInUp} className="flex justify-center mt-12">
+          <button className="font-bebas bg-primary hover:bg-primary-dark px-8 py-4 rounded-full text-white text-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40">
+            INSCRÍBETE A UNA CLASE
           </button>
         </motion.div>
       </div>

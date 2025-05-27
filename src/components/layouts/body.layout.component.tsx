@@ -7,9 +7,7 @@ const BodyLayoutComponent: FC<ChildrenProps> = ({ children }) => {
   return (
     <body className="font-montserrat bg-boxing-black text-boxing-white">
       <Navbar />
-      <main className="min-h-screen bg-[#0f0f0f] text-white overflow-hidden">
-        {children}
-      </main>
+      {children}
       <FooterSharedComponent />
     </body>
   );

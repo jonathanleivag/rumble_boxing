@@ -9,7 +9,7 @@ import CuerdaSharedComponent from "@/components/shared/cuerda.shared.component";
 
 const Home: FC = () => {
   return (
-    <>
+    <main className="min-h-screen bg-[#0f0f0f] text-white overflow-hidden">
       <HomeComponent />
       <AboutComponent />
       <CuerdaSharedComponent src="/cuerda.webp" />
@@ -19,7 +19,7 @@ const Home: FC = () => {
       <CuerdaSharedComponent src="/cuerda3.webp" />
       <PricingComponent />
       <CallComponent />
-    </>
+    </main>
   );
 };
 
