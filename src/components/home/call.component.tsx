@@ -3,17 +3,82 @@
 import { env } from "@/lib/env";
 import { fadeInUp, staggerContainer } from "@/utils/motionEffect.util";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import VideoShareModal from "../shared/videoModal.shared.component";
+
+interface Testimonial {
+  id: number;
+  name: string;
+  quote: string;
+  duration: string;
+  image?: string;
+}
+
+const testimonials: Testimonial[] = [
+  {
+    id: 1,
+    name: "ALEJANDRA TORRES",
+    quote:
+      "Desde que me uní a RUMBLE BOXING, mi condición física ha mejorado enormemente. Los entrenadores son excelentes y la comunidad es increíblemente motivadora. ¡Totalmente recomendado!",
+    duration: "Miembro desde hace 8 meses",
+    image: "/alejandro.webp",
+  },
+  {
+    id: 2,
+    name: "CARLOS RODRÍGUEZ",
+    quote:
+      "Las clases de boxeo son intensas y desafiantes, exactamente lo que buscaba. Gracias a RUMBLE BOXING he perdido 10 kilos y gané confianza. El ambiente es fantástico.",
+    duration: "Miembro desde hace 1 año",
+  },
+  {
+    id: 3,
+    name: "MARCELA GUTIÉRREZ",
+    quote:
+      "Nunca pensé que me gustaría tanto el boxeo. Los instructores hacen que cada clase sea diferente y divertida. Es un entrenamiento completo, no sólo físico sino también mental.",
+    duration: "Miembro desde hace 5 meses",
+  },
+];
 
 const CallComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState<number>(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
 
   const openModal = () => {
     setIsModalOpen(true);
     document.body.style.overflow = "hidden";
   };
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial(
+      (prev) => (prev - 1 + testimonials.length) % testimonials.length
+    );
+  };
+
+  const goToTestimonial = (index: number) => {
+    setCurrentTestimonial(index);
+    setIsAutoPlaying(false);
+  };
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isAutoPlaying) {
+      intervalId = setInterval(() => {
+        nextTestimonial();
+      }, 5000); // Cambiar cada 5 segundos
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isAutoPlaying, currentTestimonial]);
 
   return (
     <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -107,45 +172,191 @@ const CallComponent: FC = () => {
           transition={{ delay: 0.7, duration: 0.5 }}
           className="mt-20 max-w-4xl mx-auto bg-gradient-to-r from-accent-dark/80 to-[#0f0f0f]/80 p-8 rounded-2xl backdrop-blur-sm border border-accent-dark/30"
         >
-          <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
-              {/* User avatar would go here */}
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="font-bebas text-sm">FOTO</span>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={testimonials[currentTestimonial].id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-start gap-4"
+            >
+              <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
+                {testimonials[currentTestimonial].image ? (
+                  <Image
+                    src={testimonials[currentTestimonial].image}
+                    alt={testimonials[currentTestimonial].name}
+                    width={64}
+                    height={64}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-primary/20">
+                    <span className="font-bebas text-white text-xl">
+                      {testimonials[currentTestimonial].name.charAt(0)}
+                    </span>
+                  </div>
+                )}
               </div>
-            </div>
-            <div>
-              <div className="flex mb-2">
-                {[...Array(5)].map((_, i) => (
+              <div>
+                <div className="flex mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="w-4 h-4 text-primary"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    </svg>
+                  ))}
+                </div>
+                <p className="font-montserrat text-accent-light italic mb-2 text-sm">
+                  &ldquo;{testimonials[currentTestimonial].quote}&rdquo;
+                </p>
+                <div>
+                  <p className="font-oswald text-white">
+                    {testimonials[currentTestimonial].name}
+                  </p>
+                  <p className="font-montserrat text-accent-medium text-xs">
+                    {testimonials[currentTestimonial].duration}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex justify-between items-center mt-6">
+            <button
+              onClick={prevTestimonial}
+              className="w-8 h-8 rounded-full bg-accent-dark/50 text-white hover:bg-primary/30 transition-colors flex items-center justify-center"
+              aria-label="Testimonio anterior"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 18L9 12L15 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+
+            <div className="flex justify-center gap-2 items-center">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToTestimonial(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    currentTestimonial === index
+                      ? "w-8 bg-primary"
+                      : "w-2 bg-accent-medium/50"
+                  }`}
+                  aria-label={`Ir al testimonio ${index + 1}`}
+                ></button>
+              ))}
+              <button
+                onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                className="ml-2 w-6 h-6 rounded-full bg-accent-dark/70 hover:bg-primary/30 text-white transition-colors flex items-center justify-center"
+                aria-label={
+                  isAutoPlaying
+                    ? "Pausar reproducción automática"
+                    : "Activar reproducción automática"
+                }
+              >
+                {isAutoPlaying ? (
                   <svg
-                    key={i}
-                    className="w-4 h-4 text-primary"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                    <rect
+                      x="6"
+                      y="4"
+                      width="4"
+                      height="16"
+                      rx="1"
+                      fill="currentColor"
+                    />
+                    <rect
+                      x="14"
+                      y="4"
+                      width="4"
+                      height="16"
+                      rx="1"
+                      fill="currentColor"
+                    />
                   </svg>
-                ))}
-              </div>
-              <p className="font-montserrat text-accent-light italic mb-2 text-sm">
-                &ldquo;Desde que me uní a RUMBLE BOXING, mi condición física ha
-                mejorado enormemente. Los entrenadores son excelentes y la
-                comunidad es increíblemente motivadora. ¡Totalmente
-                recomendado!&rdquo;
-              </p>
-              <div>
-                <p className="font-oswald text-white">ALEJANDRA TORRES</p>
-                <p className="font-montserrat text-accent-medium text-xs">
-                  Miembro desde hace 8 meses
-                </p>
-              </div>
+                ) : (
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M5 4v16l16-8-16-8z" fill="currentColor" />
+                  </svg>
+                )}
+              </button>
             </div>
+
+            <button
+              onClick={nextTestimonial}
+              className="w-8 h-8 rounded-full bg-accent-dark/50 text-white hover:bg-primary/30 transition-colors flex items-center justify-center"
+              aria-label="Siguiente testimonio"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9 6L15 12L9 18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
           </div>
-          <div className="flex justify-center mt-6 gap-1">
-            <button className="w-8 h-2 bg-primary rounded-full"></button>
-            <button className="w-2 h-2 bg-accent-medium/50 rounded-full"></button>
-            <button className="w-2 h-2 bg-accent-medium/50 rounded-full"></button>
+
+          <div className="mt-8 pt-6 border-t border-accent-dark/30 flex justify-center">
+            <button
+              onClick={() => {}}
+              className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary font-oswald py-3 px-6 rounded-full transition-all duration-300 border border-primary/30 cursor-pointer"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-primary"
+              >
+                <path
+                  d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              COMENTAR
+            </button>
           </div>
         </motion.div>
       </motion.div>
