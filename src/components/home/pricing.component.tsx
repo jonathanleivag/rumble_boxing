@@ -23,21 +23,25 @@ const PricingComponent: FC = () => {
           variants={staggerContainer}
           className="text-center mb-16"
         >
-          <motion.div
-            variants={fadeInUp}
-            className="inline-block px-6 py-2 bg-primary/10 rounded-full mb-4"
-          >
-            <span className="font-oswald text-primary text-sm tracking-widest">
-              MEMBRESÍAS
-            </span>
+          <motion.div className="flex flex-row justify-center items-center gap-3">
+            <motion.div
+              variants={fadeInUp}
+              className="flex justify-center mb-4"
+            >
+              <div className="inline-block px-6 py-2 bg-primary/10 rounded-full">
+                <span className="font-oswald text-primary text-sm tracking-widest">
+                  MEMBRESÍAS
+                </span>
+              </div>
+            </motion.div>
+            <motion.h2
+              variants={fadeInUp}
+              className="font-bebas text-5xl md:text-6xl text-white mb-4 relative"
+            >
+              PLANES DE MEMBRESÍA
+              <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-primary"></span>
+            </motion.h2>
           </motion.div>
-          <motion.h2
-            variants={fadeInUp}
-            className="font-bebas text-5xl md:text-6xl text-white mb-4 relative inline-block"
-          >
-            PLANES DE MEMBRESÍA
-            <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-primary"></span>
-          </motion.h2>
           <motion.p
             variants={fadeInUp}
             className="font-montserrat text-accent-medium max-w-3xl mx-auto mt-6"
