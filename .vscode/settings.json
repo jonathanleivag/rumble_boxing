@@ -2,7 +2,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
-  "files.autoSave": "onWindowChange",
+  "files.autoSave": "afterDelay",
   "css.lint.unknownAtRules": "ignore",
   "cSpell.language": "en, es",
   "cSpell.words": [
