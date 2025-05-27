@@ -66,7 +66,7 @@ const TrainersComponent: FC = () => {
 
             <p className="font-montserrat text-accent-medium text-base leading-relaxed mb-8 max-w-xl">
               Especialista en técnica avanzada con más de 15 años de experiencia
-              competitiva. Carlos ha entrenado a boxeadores profesionales y
+              competitiva. Alejandro ha entrenado a boxeadores profesionales y
               ahora dedica su experiencia a transformar la condición física de
               nuestros miembros.
             </p>

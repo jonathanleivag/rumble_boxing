@@ -72,7 +72,7 @@ const CallComponent: FC = () => {
             </Link>
             <button
               onClick={openModal}
-              className="inline-flex items-center justify-center gap-2 font-oswald text-white hover:text-primary transition-colors"
+              className="inline-flex items-center justify-center gap-2 font-oswald text-white hover:text-primary transition-colors cursor-pointer"
             >
               <svg
                 width="24"
