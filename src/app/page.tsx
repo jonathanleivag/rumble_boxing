@@ -6,6 +6,7 @@ import TrainersComponent from "@/components/home/trainers.component";
 import PricingComponent from "@/components/home/pricing.component";
 import CallComponent from "@/components/home/call.component";
 import CuerdaSharedComponent from "@/components/shared/cuerda.shared.component";
+import QuestionsComponent from "@/components/home/questions.component.";
 
 const Home: FC = () => {
   return (
@@ -18,6 +19,7 @@ const Home: FC = () => {
       <TrainersComponent />
       <CuerdaSharedComponent src="/cuerda3.webp" />
       <PricingComponent />
+      <QuestionsComponent />
       <CallComponent />
     </main>
   );

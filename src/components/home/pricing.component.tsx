@@ -48,8 +48,26 @@ const PricingComponent: FC = () => {
           >
             Elige el plan que mejor se adapte a tus objetivos y horario. Todas
             las membresías incluyen acceso a nuestras instalaciones de primer
-            nivel.
+            nivel y tu primera clase de prueba es totalmente GRATIS.
           </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-center mb-10 bg-gradient-to-r from-accent-dark/50 via-primary/20 to-accent-dark/50 py-3 px-4 rounded-lg max-w-3xl mx-auto"
+        >
+          <p className="font-montserrat text-accent-light">
+            <span className="font-oswald text-primary text-lg mr-2">
+              MATRÍCULA:
+            </span>
+            <span className="text-white font-semibold">$50</span>
+            <span className="text-accent-medium text-sm ml-2">
+              (pago único al inscribirte)
+            </span>
+          </p>
         </motion.div>
 
         <motion.div
@@ -67,7 +85,7 @@ const PricingComponent: FC = () => {
           >
             <div className="text-center mb-4">
               <span className="font-oswald inline-block px-4 py-1 rounded-full bg-accent-dark/80 text-accent-light text-sm">
-                BÁSICO
+                MENSUAL
               </span>
             </div>
             <div className="text-center mb-6">
@@ -78,8 +96,8 @@ const PricingComponent: FC = () => {
                 </span>
               </div>
               <p className="font-montserrat text-accent-medium text-sm">
-                Ideal para principiantes que buscan iniciarse en el mundo del
-                boxeo.
+                Plan flexible mensual para quienes están comenzando en el mundo
+                del boxeo.
               </p>
             </div>
             <ul className="font-montserrat text-accent-light space-y-4 mb-8 text-sm">
@@ -143,6 +161,28 @@ const PricingComponent: FC = () => {
                 </span>
                 <span>Evaluación inicial</span>
               </li>
+              <li className="flex items-start">
+                <span className="text-primary mr-2 mt-0.5 flex-shrink-0">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12L10 17L19 8"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <span className="text-primary font-medium">
+                  Primera clase GRATIS
+                </span>
+              </li>
             </ul>
             <button className="w-full font-oswald text-lg uppercase bg-transparent border-2 border-primary hover:bg-primary/10 transition-all duration-300 tracking-wider py-3 px-8 rounded-full">
               ELEGIR PLAN
@@ -162,18 +202,18 @@ const PricingComponent: FC = () => {
             </div>
             <div className="text-center mb-4 mt-2">
               <span className="font-oswald inline-block px-4 py-1 rounded-full bg-primary/20 text-primary text-sm">
-                PREMIUM
+                ANUAL
               </span>
             </div>
             <div className="text-center mb-6">
               <div className="font-bebas text-6xl text-primary mb-2 flex justify-center items-start">
-                <span className="text-2xl mr-1 mt-2">$</span>149
+                <span className="text-2xl mr-1 mt-2">$</span>1,490
                 <span className="text-lg text-accent-medium self-end mb-2">
-                  /mes
+                  /año
                 </span>
               </div>
               <p className="font-montserrat text-accent-medium text-sm">
-                Perfecto para quienes buscan un entrenamiento regular y
+                Ahorra con nuestro plan anual para un entrenamiento constante y
                 completo.
               </p>
             </div>
@@ -258,6 +298,28 @@ const PricingComponent: FC = () => {
                 </span>
                 <span>Plan de nutrición básico</span>
               </li>
+              <li className="flex items-start">
+                <span className="text-primary mr-2 mt-0.5 flex-shrink-0">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12L10 17L19 8"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <span className="text-primary font-medium">
+                  Primera clase GRATIS
+                </span>
+              </li>
             </ul>
             <button className="w-full font-oswald text-lg uppercase bg-primary hover:bg-primary-dark transition-all duration-300 tracking-wider py-3 px-8 rounded-full text-white shadow-lg shadow-primary/30">
               ELEGIR PLAN
@@ -272,19 +334,17 @@ const PricingComponent: FC = () => {
           >
             <div className="text-center mb-4">
               <span className="font-oswald inline-block px-4 py-1 rounded-full bg-accent-dark/80 text-accent-light text-sm">
-                ELITE
+                PERSONALIZADO
               </span>
             </div>
             <div className="text-center mb-6">
               <div className="font-bebas text-6xl text-primary mb-2 flex justify-center items-start">
-                <span className="text-2xl mr-1 mt-2">$</span>249
-                <span className="text-lg text-accent-medium self-end mb-2">
-                  /mes
-                </span>
+                <span className="text-2xl mr-1 mt-2"></span>Consultar
+                <span className="text-lg text-accent-medium self-end mb-2"></span>
               </div>
               <p className="font-montserrat text-accent-medium text-sm">
-                Para boxeadores serios que buscan entrenamiento de élite y
-                atención personalizada.
+                Plan a medida según tus objetivos específicos y nivel de
+                experiencia.
               </p>
             </div>
             <ul className="font-montserrat text-accent-light space-y-4 mb-8 text-sm">
@@ -306,7 +366,7 @@ const PricingComponent: FC = () => {
                     />
                   </svg>
                 </span>
-                <span>Clases ilimitadas</span>
+                <span>Entrenamiento totalmente personalizado</span>
               </li>
               <li className="flex items-start">
                 <span className="text-primary mr-2 mt-0.5 flex-shrink-0">
@@ -326,7 +386,7 @@ const PricingComponent: FC = () => {
                     />
                   </svg>
                 </span>
-                <span>4 sesiones privadas mensuales</span>
+                <span>Sesiones privadas a la medida</span>
               </li>
               <li className="flex items-start">
                 <span className="text-primary mr-2 mt-0.5 flex-shrink-0">
@@ -368,44 +428,33 @@ const PricingComponent: FC = () => {
                 </span>
                 <span>Acceso prioritario a eventos</span>
               </li>
+              <li className="flex items-start">
+                <span className="text-primary mr-2 mt-0.5 flex-shrink-0">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12L10 17L19 8"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <span className="text-primary font-medium">
+                  Primera clase GRATIS
+                </span>
+              </li>
             </ul>
             <button className="w-full font-oswald text-lg uppercase bg-transparent border-2 border-primary hover:bg-primary/10 transition-all duration-300 tracking-wider py-3 px-8 rounded-full">
-              ELEGIR PLAN
+              CONSULTAR
             </button>
           </motion.div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-center mt-12 border-t border-accent-dark/50 pt-8"
-        >
-          <p className="font-montserrat text-accent-medium mb-2 text-sm">
-            ¿Tienes dudas sobre nuestros planes?
-          </p>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 font-oswald text-primary hover:underline"
-          >
-            <span>CONSULTA NUESTRAS PREGUNTAS FRECUENTES</span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5 12H19M19 12L12 5M19 12L12 19"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
         </motion.div>
       </div>
     </section>
