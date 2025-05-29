@@ -11,7 +11,7 @@ import CommentModal from "../shared/commentModal.shared.component";
 import LoginButton from "../auth/login-button";
 import { signOut, useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { getComments } from "@/lib/db/comment/actions";
+import { getComments, oneComment } from "@/lib/db/comment/actions";
 import {
   addComment,
   initialComment,
@@ -24,6 +24,9 @@ const CallComponent: FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState<number>(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
   const [showNotification, setShowNotification] = useState<boolean>(false);
+  const [quote, setQuote] = useState<string>("");
+  const [rating, setRating] = useState<number>(5);
+  const [edit, setEdit] = useState<boolean>(false);
   const { data: session } = useSession();
   const comments = useAppSelector((state) => state.comment.comments);
   const dispatch = useAppDispatch();
@@ -46,7 +49,19 @@ const CallComponent: FC = () => {
     document.body.style.overflow = "hidden";
   };
 
-  const openCommentModal = () => {
+  const openCommentModal = async () => {
+    if (session?.user?.email) {
+      const data = await oneComment(session?.user?.email);
+      if (data) {
+        setQuote(data.quote);
+        setRating(data.rating);
+        setEdit(true);
+      } else {
+        setQuote("");
+        setRating(5);
+        setEdit(false);
+      }
+    }
     setIsCommentModalOpen(true);
   };
 
@@ -55,8 +70,13 @@ const CallComponent: FC = () => {
   };
 
   const handleCommentSubmit = (commentData: ICommentData) => {
+    console.log({ commentData });
+
     if (session?.user) {
-      dispatch(addComment(commentData));
+      if (!edit) {
+        dispatch(addComment(commentData));
+        setCurrentTestimonial(comments.length);
+      }
       setShowNotification(true);
       setTimeout(() => {
         setShowNotification(false);
@@ -190,6 +210,9 @@ const CallComponent: FC = () => {
               isOpen={isCommentModalOpen}
               onClose={closeCommentModal}
               onSubmit={handleCommentSubmit}
+              quote={quote}
+              rating={rating}
+              edit={edit}
             />
           )}
         </AnimatePresence>
@@ -201,7 +224,7 @@ const CallComponent: FC = () => {
           className="mt-20 max-w-4xl mx-auto bg-gradient-to-r from-accent-dark/80 to-[#0f0f0f]/80 p-8 rounded-2xl backdrop-blur-sm border border-accent-dark/30"
         >
           <AnimatePresence mode="wait">
-            {comments.length > 0 && (
+            {comments.length > 0 && comments[currentTestimonial] && (
               <motion.div
                 key={comments[currentTestimonial]._id?.toString()}
                 initial={{ opacity: 0, x: 20 }}
@@ -211,7 +234,7 @@ const CallComponent: FC = () => {
                 className="flex items-start gap-4"
               >
                 <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
-                  {comments[currentTestimonial].image ? (
+                  {comments[currentTestimonial]?.image ? (
                     <Image
                       src={comments[currentTestimonial].image}
                       alt={comments[currentTestimonial].name}

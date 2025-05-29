@@ -4,14 +4,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FC, useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { CommentModalProps } from "@/type";
+import { CommentModalProps, ICommentData } from "@/type";
 import { textRating } from "@/utils/rating.util";
 import { addComment } from "@/lib/db/comment/actions";
 
-const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  const [rating, setRating] = useState<number>(5);
+const CommentModal: FC<CommentModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  quote,
+  rating: valueRating,
+  edit,
+}) => {
+  const [rating, setRating] = useState<number>(valueRating);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
-  const [comment, setComment] = useState<string>("");
+  const [comment, setComment] = useState<string>(quote);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { data: session } = useSession();
 
@@ -19,14 +26,19 @@ const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
     e.preventDefault();
     try {
       setIsSubmitting(true);
-      const data = await addComment({
-        name: session?.user?.name || "Usuario Anónimo",
-        quote: comment,
-        image: session?.user?.image || "",
-        textRating: textRating(rating),
-        email: session?.user?.email || "",
-        rating,
-      });
+      let data: ICommentData;
+      if (!edit) {
+        data = await addComment({
+          name: session?.user?.name || "Usuario Anónimo",
+          quote: comment,
+          image: session?.user?.image || "",
+          textRating: textRating(rating),
+          email: session?.user?.email || "",
+          rating,
+        });
+      } else {
+        data = {} as ICommentData;
+      }
 
       onSubmit(data);
       setIsSubmitting(false);
@@ -210,8 +222,10 @@ const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
                     {isSubmitting ? (
                       <>
                         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                        ENVIANDO...
+                        {edit ? "ACTUALIZANDO..." : "ENVIANDO..."}
                       </>
+                    ) : edit ? (
+                      "EDITAR COMENTARIO"
                     ) : (
                       "ENVIAR COMENTARIO"
                     )}

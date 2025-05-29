@@ -19,6 +19,9 @@ export interface CommentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (commentData: ICommentData) => void;
+  quote: string;
+  rating: number;
+  edit: boolean;
 }
 
 export interface IComment {

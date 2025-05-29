@@ -58,3 +58,33 @@ export const getComments = async () => {
     return [];
   }
 };
+
+export const oneComment = async (
+  email: string
+): Promise<ICommentData | null> => {
+  await connectToMongoDB();
+  try {
+    const comment = await Comment.findOne({ email });
+    if (!comment) {
+      return null;
+    }
+
+    return {
+      _id: comment.id.toString(),
+      name: comment.name,
+      email: comment.email,
+      quote: comment.quote,
+      createdAt: new Date(comment.createdAt).toISOString(),
+      updatedAt: new Date(comment.updatedAt).toISOString(),
+      image: comment.image || "",
+      rating: comment.rating,
+      textRating: comment.textRating || "",
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error al obtener el comentario:", error.message);
+      throw new Error("Error al obtener el comentario");
+    }
+    return null;
+  }
+};
