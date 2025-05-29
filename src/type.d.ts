@@ -1,5 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
-import { Document, ObjectId } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -18,7 +18,7 @@ export type TestimonialComment = Omit<Testimonial, "id" | "duration">;
 export interface CommentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (commentData: { rating: number; comment: string }) => void;
+  onSubmit: (commentData: ICommentData) => void;
 }
 
 export interface IComment {
@@ -27,10 +27,17 @@ export interface IComment {
   image?: string;
   textRating: string;
   email: string;
+  rating: number;
 }
 
-export interface ICommentDocument extends IComment, Document {
-  id: ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+export interface ICommentData extends IComment {
+  _id: Types.ObjectId;
+  createdAt: string;
+  updatedAt: string;
 }
+
+export interface ICommentSlice {
+  comments: ICommentData[];
+}
+
+export interface ICommentDocument extends ICommentData, Document {}

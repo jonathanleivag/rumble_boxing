@@ -240,8 +240,9 @@ const Navbar: FC = () => {
             </Link>
             <div className="flex items-center space-x-3">
               <Link
-                href="#"
+                href="#call"
                 className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group"
+                onClick={(e) => scrollToSection(e, "#call")}
               >
                 <span className="relative z-10">Reservar Clase</span>
                 <motion.div

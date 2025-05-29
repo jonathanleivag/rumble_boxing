@@ -5,9 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FC, useState } from "react";
 import Image from "next/image";
 import VideoShareModal from "../shared/videoModal.shared.component";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 const AboutComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const comments = useAppSelector((state) => state.comment.comments);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -58,7 +60,9 @@ const AboutComponent: FC = () => {
               </p>
             </div>
             <div className="bg-gradient-to-br from-accent-dark to-accent-dark/50 p-6 rounded-2xl flex-1 backdrop-blur-sm border border-accent-dark/50 hover:border-primary/30 transition-all duration-300 transform hover:-translate-y-1">
-              <h4 className="font-oswald text-2xl mb-2 text-primary">+30</h4>
+              <h4 className="font-oswald text-2xl mb-2 text-primary">
+                +{comments.length}
+              </h4>
               <p className="font-montserrat text-accent-medium">
                 Miembros activos
               </p>
@@ -66,22 +70,30 @@ const AboutComponent: FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
-              <div className="w-12 h-12 rounded-full border-2 border-primary bg-accent-dark overflow-hidden flex items-center justify-center">
-                <span className="font-bebas text-xs">U1</span>
-              </div>
-              <div className="w-12 h-12 rounded-full border-2 border-primary bg-accent-dark overflow-hidden flex items-center justify-center">
-                <span className="font-bebas text-xs">U2</span>
-              </div>
-              <div className="w-12 h-12 rounded-full border-2 border-primary bg-accent-dark overflow-hidden flex items-center justify-center">
-                <span className="font-bebas text-xs">U3</span>
-              </div>
+              {comments.slice(0, 4).map((comment) => (
+                <div
+                  key={comment._id.toString()}
+                  className="w-12 h-12 rounded-full border-2 border-primary bg-accent-dark overflow-hidden flex items-center justify-center"
+                >
+                  <span className="font-bebas text-xs">
+                    <Image
+                      src={comment.image!}
+                      alt={comment.name}
+                      width={48}
+                      height={48}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  </span>
+                </div>
+              ))}
               <div className="w-12 h-12 rounded-full border-2 border-primary bg-accent-dark overflow-hidden flex items-center justify-center">
                 <span className="font-bebas text-xs">+</span>
               </div>
             </div>
             <p className="font-montserrat text-sm text-accent-medium">
-              Únete a <span className="text-white">+500 miembros</span> que ya
-              están transformando sus vidas
+              Únete a{" "}
+              <span className="text-white">+{comments.length} miembros</span>{" "}
+              que ya están transformando sus vidas
             </p>
           </div>
         </motion.div>

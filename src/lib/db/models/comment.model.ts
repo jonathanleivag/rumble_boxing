@@ -26,6 +26,12 @@ const commentSchema = new mongoose.Schema<ICommentDocument>(
       lowercase: true,
       trim: true,
     },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
   },
   {
     timestamps: true,

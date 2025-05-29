@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Oswald, Montserrat } from "next/font/google";
 import "./globals.css";
 import BodyLayoutComponent from "@/components/layouts/body.layout.component";
-import { connectToMongoDB } from "@/lib/mongoose";
+import { connectToMongoDB } from "@/lib/db/mongoose";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
