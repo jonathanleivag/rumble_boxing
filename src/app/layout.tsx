@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Bebas_Neue, Oswald, Montserrat } from "next/font/google";
 import "./globals.css";
 import BodyLayoutComponent from "@/components/layouts/body.layout.component";
+import { connectToMongoDB } from "@/lib/mongoose";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -32,6 +33,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  connectToMongoDB();
   return (
     <html
       lang="es"

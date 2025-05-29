@@ -5,24 +5,31 @@ import { FC, useState } from "react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { CommentModalProps } from "@/type";
+import { textRating } from "@/utils/rating.util";
+import { addComment } from "@/lib/comment/actions";
 
 const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [rating, setRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [comment, setComment] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { data: session } = useSession();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // TODO: Aquí puedes agregar la lógica para enviar el comentario a tu db
-    setTimeout(() => {
-      onSubmit({ rating, comment });
-      setIsSubmitting(false);
-      onClose();
-      setRating(5);
-      setComment("");
-    }, 800);
+    const data = await addComment({
+      name: session?.user?.name || "Usuario Anónimo",
+      quote: comment,
+      image: session?.user?.image || "",
+      textRating: textRating(rating),
+      email: session?.user?.email || "",
+    });
+    onSubmit({ rating, comment });
+    setIsSubmitting(false);
+    onClose();
+    setRating(5);
+    setComment("");
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -108,26 +115,57 @@ const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
                 <label className="block font-oswald text-white mb-2">
                   CALIFICACIÓN
                 </label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      className="focus:outline-none"
-                    >
-                      <svg
-                        className={`w-8 h-8 ${
-                          star <= rating ? "text-primary" : "text-accent-dark"
-                        } hover:text-primary-dark transition-colors`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
+                <div className="flex flex-col space-y-2">
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(null)}
+                        className="focus:outline-none transition-transform duration-200 hover:scale-110 relative"
+                        aria-label={`Calificar con ${star} ${
+                          star === 1 ? "estrella" : "estrellas"
+                        }`}
                       >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                      </svg>
-                    </button>
-                  ))}
+                        <motion.div
+                          whileTap={{ scale: 0.8 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 10,
+                          }}
+                        >
+                          <svg
+                            className={`w-8 h-8 ${
+                              (
+                                hoverRating !== null
+                                  ? star <= hoverRating
+                                  : star <= rating
+                              )
+                                ? "text-primary"
+                                : "text-accent-dark"
+                            } transition-colors duration-200`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                          </svg>
+                        </motion.div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-sm font-montserrat text-accent-medium">
+                    {hoverRating !== null ? (
+                      <span className="text-primary transition-colors duration-200">
+                        {textRating(hoverRating)}
+                      </span>
+                    ) : (
+                      <span className="text-primary">{textRating(rating)}</span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -142,7 +180,7 @@ const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
                   id="comment"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Cuéntanos cómo ha sido tu experiencia en RUMBLE BOXING..."
+                  placeholder="Cuéntanos cómo ha sido tu experiencia en RUMBLE BOXING CLUB..."
                   className="w-full h-32 bg-accent-dark/40 border border-accent-dark/50 rounded-lg p-3 text-white placeholder-accent-medium focus:border-primary focus:ring-1 focus:ring-primary transition-colors font-montserrat resize-none"
                   required
                 ></textarea>

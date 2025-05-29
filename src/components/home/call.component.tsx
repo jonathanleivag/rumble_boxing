@@ -5,37 +5,12 @@ import { fadeInUp, staggerContainer } from "@/utils/motionEffect.util";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useCallback } from "react";
 import VideoShareModal from "../shared/videoModal.shared.component";
 import CommentModal from "../shared/commentModal.shared.component";
-import { Testimonial } from "@/type";
 import LoginButton from "../auth/login-button";
 import { signOut, useSession } from "next-auth/react";
-
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "ALEJANDRA TORRES",
-    quote:
-      "Desde que me uní a RUMBLE BOXING, mi condición física ha mejorado enormemente. Los entrenadores son excelentes y la comunidad es increíblemente motivadora. ¡Totalmente recomendado!",
-    duration: "Miembro desde hace 8 meses",
-    image: "/alejandro.webp",
-  },
-  {
-    id: 2,
-    name: "CARLOS RODRÍGUEZ",
-    quote:
-      "Las clases de boxeo son intensas y desafiantes, exactamente lo que buscaba. Gracias a RUMBLE BOXING he perdido 10 kilos y gané confianza. El ambiente es fantástico.",
-    duration: "Miembro desde hace 1 año",
-  },
-  {
-    id: 3,
-    name: "MARCELA GUTIÉRREZ",
-    quote:
-      "Nunca pensé que me gustaría tanto el boxeo. Los instructores hacen que cada clase sea diferente y divertida. Es un entrenamiento completo, no sólo físico sino también mental.",
-    duration: "Miembro desde hace 5 meses",
-  },
-];
+import { ICommentDocument } from "@/type";
 
 const CallComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -44,6 +19,8 @@ const CallComponent: FC = () => {
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const { data: session } = useSession();
+
+  const testimonials: ICommentDocument[] = [] as unknown as ICommentDocument[];
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -62,26 +39,9 @@ const CallComponent: FC = () => {
     rating: number;
     comment: string;
   }) => {
-    console.log("Comentario enviado:", commentData);
-
     if (session?.user) {
-      const newTestimonial: Testimonial = {
-        id: testimonials.length + 1,
-        name: session.user.name?.toUpperCase() || "USUARIO",
-        quote: commentData.comment,
-        duration:
-          "Miembro desde " +
-          new Date().toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }),
-        image: session.user.image || undefined,
-      };
-
       // TODO: Aquí podrías enviar el nuevo testimonio a redux
 
-      console.log({ newTestimonial });
       setShowNotification(true);
       setTimeout(() => {
         setShowNotification(false);
@@ -91,9 +51,9 @@ const CallComponent: FC = () => {
     closeCommentModal();
   };
 
-  const nextTestimonial = () => {
+  const nextTestimonial = useCallback(() => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  };
+  }, [testimonials.length]);
 
   const prevTestimonial = () => {
     setCurrentTestimonial(
@@ -112,13 +72,13 @@ const CallComponent: FC = () => {
     if (isAutoPlaying) {
       intervalId = setInterval(() => {
         nextTestimonial();
-      }, 5000); // Cambiar cada 5 segundos
+      }, 5000);
     }
 
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [isAutoPlaying, currentTestimonial]);
+  }, [isAutoPlaying, currentTestimonial, nextTestimonial]);
 
   return (
     <section
@@ -226,58 +186,62 @@ const CallComponent: FC = () => {
           className="mt-20 max-w-4xl mx-auto bg-gradient-to-r from-accent-dark/80 to-[#0f0f0f]/80 p-8 rounded-2xl backdrop-blur-sm border border-accent-dark/30"
         >
           <AnimatePresence mode="wait">
-            <motion.div
-              key={testimonials[currentTestimonial].id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="flex items-start gap-4"
-            >
-              <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
-                {testimonials[currentTestimonial].image ? (
-                  <Image
-                    src={testimonials[currentTestimonial].image}
-                    alt={testimonials[currentTestimonial].name}
-                    width={64}
-                    height={64}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-primary/20">
-                    <span className="font-bebas text-white text-xl">
-                      {testimonials[currentTestimonial].name.charAt(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div>
-                <div className="flex mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="w-4 h-4 text-primary"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                    </svg>
-                  ))}
+            {testimonials.length > 0 && (
+              <motion.div
+                key={testimonials[currentTestimonial].id?.toString()}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-start gap-4"
+              >
+                <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
+                  {testimonials[currentTestimonial].image ? (
+                    <Image
+                      src={testimonials[currentTestimonial].image}
+                      alt={testimonials[currentTestimonial].name}
+                      width={64}
+                      height={64}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-primary/20">
+                      <span className="font-bebas text-white text-xl">
+                        {testimonials[currentTestimonial].name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <p className="font-montserrat text-accent-light italic mb-2 text-sm">
-                  &ldquo;{testimonials[currentTestimonial].quote}&rdquo;
-                </p>
                 <div>
-                  <p className="font-oswald text-white">
-                    {testimonials[currentTestimonial].name}
+                  <div className="flex mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <svg
+                        key={i}
+                        className="w-4 h-4 text-primary"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="font-montserrat text-accent-light italic mb-2 text-sm">
+                    &ldquo;{testimonials[currentTestimonial].quote}&rdquo;
                   </p>
-                  <p className="font-montserrat text-accent-medium text-xs">
-                    {testimonials[currentTestimonial].duration}
-                  </p>
+                  <div>
+                    <p className="font-oswald text-white">
+                      {testimonials[currentTestimonial].name}
+                    </p>
+                    <p className="font-montserrat text-accent-medium text-xs">
+                      {testimonials[currentTestimonial].createdAt
+                        ? new Date(testimonials[currentTestimonial].createdAt).toLocaleDateString()
+                        : ""}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            )}
           </AnimatePresence>
 
           <div className="flex justify-between items-center mt-6">
