@@ -51,7 +51,6 @@ const Navbar: FC = () => {
     e.preventDefault();
     const section = document.querySelector(sectionId);
     if (section) {
-      // Cerrar el menú móvil si está abierto
       if (mobileMenuOpen) setMobileMenuOpen(false);
 
       setActiveLink(sectionId.substring(1));
@@ -244,7 +243,7 @@ const Navbar: FC = () => {
                 className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group"
                 onClick={(e) => scrollToSection(e, "#call")}
               >
-                <span className="relative z-10">Reservar Clase</span>
+                <span className="relative z-10">Comentarios</span>
                 <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-[#e02020] to-[#ff4d4d] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   animate={{
@@ -319,7 +318,6 @@ const Navbar: FC = () => {
             <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#e02020]/30 to-transparent"></div>
 
             <div className="container mx-auto py-6 relative">
-              {/* Líneas verticales decorativas */}
               <div className="absolute top-0 left-0 bottom-0 w-[1px] bg-gradient-to-b from-[#e02020]/20 via-transparent to-[#e02020]/20 opacity-50"></div>
               <div className="absolute top-0 right-0 bottom-0 w-[1px] bg-gradient-to-b from-[#e02020]/20 via-transparent to-[#e02020]/20 opacity-50"></div>
 
@@ -335,7 +333,7 @@ const Navbar: FC = () => {
                       className={`font-oswald text-white hover:text-primary transition-colors text-lg uppercase tracking-wider py-2 border-b border-accent-dark/20 block relative ${
                         activeLink === "hero" ? "text-primary" : ""
                       }`}
-                      onClick={(e) => scrollToSection(e, "#hero")}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Inicio
                       {activeLink === "hero" && (
@@ -359,7 +357,7 @@ const Navbar: FC = () => {
                       className={`font-oswald text-white hover:text-primary transition-colors text-lg uppercase tracking-wider py-2 border-b border-accent-dark/20 block relative ${
                         activeLink === "about" ? "text-primary" : ""
                       }`}
-                      onClick={(e) => scrollToSection(e, "#about")}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Sobre Nosotros
                       {activeLink === "about" && (
@@ -383,7 +381,7 @@ const Navbar: FC = () => {
                       className={`font-oswald text-white hover:text-primary transition-colors text-lg uppercase tracking-wider py-2 border-b border-accent-dark/20 block relative ${
                         activeLink === "classes" ? "text-primary" : ""
                       }`}
-                      onClick={(e) => scrollToSection(e, "#classes")}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Clases
                       {activeLink === "classes" && (
@@ -407,7 +405,7 @@ const Navbar: FC = () => {
                       className={`font-oswald text-white hover:text-primary transition-colors text-lg uppercase tracking-wider py-2 border-b border-accent-dark/20 block relative ${
                         activeLink === "trainers" ? "text-primary" : ""
                       }`}
-                      onClick={(e) => scrollToSection(e, "#trainers")}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Entrenadores
                       {activeLink === "trainers" && (
@@ -431,7 +429,7 @@ const Navbar: FC = () => {
                       className={`font-oswald text-white hover:text-primary transition-colors text-lg uppercase tracking-wider py-2 border-b border-accent-dark/20 block relative ${
                         activeLink === "pricing" ? "text-primary" : ""
                       }`}
-                      onClick={(e) => scrollToSection(e, "#pricing")}
+                      onClick={() => setMobileMenuOpen(false)}
                     >
                       Precios
                       {activeLink === "pricing" && (
@@ -451,11 +449,11 @@ const Navbar: FC = () => {
 
                   <motion.div variants={fadeInUp}>
                     <Link
-                      href="#"
+                      href="#call"
                       className="font-oswald bg-primary hover:bg-primary-dark text-white py-3 px-5 rounded-full text-center text-lg uppercase tracking-wider transition-all duration-300 mt-2 block relative overflow-hidden group"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="relative z-10">Reservar Clase</span>
+                      <span className="relative z-10">Comentarios</span>
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-[#e02020] to-[#ff4d4d] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         animate={{
