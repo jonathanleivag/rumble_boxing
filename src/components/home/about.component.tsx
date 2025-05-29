@@ -94,6 +94,7 @@ const AboutComponent: FC = () => {
               src="/alejandro.webp"
               alt="Boxeador entrenando en Rumble Boxing"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-in-out"
               priority
             />

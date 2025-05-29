@@ -8,6 +8,7 @@ const requiredEnv = [
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
   "NEXTAUTH_SECRET",
+  "MONGODB_URI",
 ];
 
 requiredEnv.forEach((envVar) => {
@@ -18,7 +19,12 @@ requiredEnv.forEach((envVar) => {
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["lh3.googleusercontent.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+    ],
   },
 };
 
