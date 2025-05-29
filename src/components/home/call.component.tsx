@@ -10,7 +10,13 @@ import VideoShareModal from "../shared/videoModal.shared.component";
 import CommentModal from "../shared/commentModal.shared.component";
 import LoginButton from "../auth/login-button";
 import { signOut, useSession } from "next-auth/react";
-import { ICommentDocument } from "@/type";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { getComments } from "@/lib/db/comment/actions";
+import {
+  addComment,
+  initialComment,
+} from "@/lib/redux/features/comment/comment.slice";
+import { ICommentData } from "@/type";
 
 const CallComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -19,8 +25,21 @@ const CallComponent: FC = () => {
   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const { data: session } = useSession();
+  const comments = useAppSelector((state) => state.comment.comments);
+  const dispatch = useAppDispatch();
 
-  const testimonials: ICommentDocument[] = [] as unknown as ICommentDocument[];
+  useEffect(() => {
+    const dataFetch = async () => {
+      try {
+        const commentsData = await getComments();
+        dispatch(initialComment(commentsData));
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+    void dataFetch();
+    return () => {};
+  }, [dispatch]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -35,13 +54,9 @@ const CallComponent: FC = () => {
     setIsCommentModalOpen(false);
   };
 
-  const handleCommentSubmit = (commentData: {
-    rating: number;
-    comment: string;
-  }) => {
+  const handleCommentSubmit = (commentData: ICommentData) => {
     if (session?.user) {
-      // TODO: Aquí podrías enviar el nuevo testimonio a redux
-
+      dispatch(addComment(commentData));
       setShowNotification(true);
       setTimeout(() => {
         setShowNotification(false);
@@ -52,12 +67,12 @@ const CallComponent: FC = () => {
   };
 
   const nextTestimonial = useCallback(() => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  }, [testimonials.length]);
+    setCurrentTestimonial((prev) => (prev + 1) % comments.length);
+  }, [comments.length]);
 
   const prevTestimonial = () => {
     setCurrentTestimonial(
-      (prev) => (prev - 1 + testimonials.length) % testimonials.length
+      (prev) => (prev - 1 + comments.length) % comments.length
     );
   };
 
@@ -186,9 +201,9 @@ const CallComponent: FC = () => {
           className="mt-20 max-w-4xl mx-auto bg-gradient-to-r from-accent-dark/80 to-[#0f0f0f]/80 p-8 rounded-2xl backdrop-blur-sm border border-accent-dark/30"
         >
           <AnimatePresence mode="wait">
-            {testimonials.length > 0 && (
+            {comments.length > 0 && (
               <motion.div
-                key={testimonials[currentTestimonial].id?.toString()}
+                key={comments[currentTestimonial]._id?.toString()}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -196,10 +211,10 @@ const CallComponent: FC = () => {
                 className="flex items-start gap-4"
               >
                 <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
-                  {testimonials[currentTestimonial].image ? (
+                  {comments[currentTestimonial].image ? (
                     <Image
-                      src={testimonials[currentTestimonial].image}
-                      alt={testimonials[currentTestimonial].name}
+                      src={comments[currentTestimonial].image}
+                      alt={comments[currentTestimonial].name}
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
@@ -207,36 +222,38 @@ const CallComponent: FC = () => {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary/20">
                       <span className="font-bebas text-white text-xl">
-                        {testimonials[currentTestimonial].name.charAt(0)}
+                        {comments[currentTestimonial].name.charAt(0)}
                       </span>
                     </div>
                   )}
                 </div>
                 <div>
                   <div className="flex mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className="w-4 h-4 text-primary"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                      </svg>
-                    ))}
+                    {[...Array(comments[currentTestimonial].rating)].map(
+                      (_, i) => (
+                        <svg
+                          key={i}
+                          className="w-4 h-4 text-primary"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                      )
+                    )}
                   </div>
                   <p className="font-montserrat text-accent-light italic mb-2 text-sm">
-                    &ldquo;{testimonials[currentTestimonial].quote}&rdquo;
+                    &ldquo;{comments[currentTestimonial].quote}&rdquo;
                   </p>
                   <div>
                     <p className="font-oswald text-white">
-                      {testimonials[currentTestimonial].name}
+                      {comments[currentTestimonial].name}
                     </p>
                     <p className="font-montserrat text-accent-medium text-xs">
-                      {testimonials[currentTestimonial].createdAt
+                      {comments[currentTestimonial].createdAt
                         ? new Date(
-                            testimonials[currentTestimonial].createdAt
+                            comments[currentTestimonial].createdAt
                           ).toLocaleDateString()
                         : ""}
                     </p>
@@ -245,7 +262,7 @@ const CallComponent: FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
-          {testimonials.length !== 0 && (
+          {comments.length !== 0 && (
             <div className="flex justify-between items-center mt-6">
               <button
                 onClick={prevTestimonial}
@@ -270,7 +287,7 @@ const CallComponent: FC = () => {
               </button>
 
               <div className="flex justify-center gap-2 items-center">
-                {testimonials.map((_, index) => (
+                {comments.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToTestimonial(index)}

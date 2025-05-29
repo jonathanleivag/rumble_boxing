@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { CommentModalProps } from "@/type";
 import { textRating } from "@/utils/rating.util";
-import { addComment } from "@/lib/comment/actions";
+import { addComment } from "@/lib/db/comment/actions";
 
 const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [rating, setRating] = useState<number>(5);
@@ -17,19 +17,26 @@ const CommentModal: FC<CommentModalProps> = ({ isOpen, onClose, onSubmit }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    const data = await addComment({
-      name: session?.user?.name || "Usuario Anónimo",
-      quote: comment,
-      image: session?.user?.image || "",
-      textRating: textRating(rating),
-      email: session?.user?.email || "",
-    });
-    onSubmit({ rating, comment });
-    setIsSubmitting(false);
-    onClose();
-    setRating(5);
-    setComment("");
+    try {
+      setIsSubmitting(true);
+      const data = await addComment({
+        name: session?.user?.name || "Usuario Anónimo",
+        quote: comment,
+        image: session?.user?.image || "",
+        textRating: textRating(rating),
+        email: session?.user?.email || "",
+        rating,
+      });
+
+      onSubmit(data);
+      setIsSubmitting(false);
+      onClose();
+      setRating(5);
+      setComment("");
+    } catch (error) {
+      console.error("Error al enviar el comentario:", error);
+      setIsSubmitting(false);
+    }
   };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {

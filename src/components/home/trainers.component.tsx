@@ -3,8 +3,10 @@
 import { motion } from "framer-motion";
 import { FC } from "react";
 import Image from "next/image";
+import { useAppSelector } from "@/lib/redux/hooks";
 
 const TrainersComponent: FC = () => {
+  const comments = useAppSelector((state) => state.comment.comments);
   return (
     <section
       id="trainers"
@@ -112,7 +114,9 @@ const TrainersComponent: FC = () => {
               </div>
               <div className="relative overflow-hidden bg-gradient-to-br from-accent-dark/40 to-black/40 p-6 rounded-2xl backdrop-blur-sm border border-accent-dark/10">
                 <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-primary/10 blur-xl"></div>
-                <div className="text-primary font-bebas text-4xl mb-1">60+</div>
+                <div className="text-primary font-bebas text-4xl mb-1">
+                  +{comments.length}
+                </div>
                 <div className="text-white/70 font-oswald text-sm tracking-wide">
                   ALUMNOS ENTRENADOS
                 </div>
