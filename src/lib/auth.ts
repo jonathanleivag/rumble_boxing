@@ -5,6 +5,10 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   throw new Error("Google Client ID and Secret must be provided");
 }
 
+if (!process.env.NEXTAUTH_SECRET || !process.env.AUTH_SECRET) {
+  throw new Error("NEXTAUTH_SECRET or AUTH_SECRET must be provided");
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
