@@ -14,9 +14,11 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getComments, oneComment } from "@/lib/db/comment/actions";
 import {
   addComment,
+  editComment,
   initialComment,
 } from "@/lib/redux/features/comment/comment.slice";
 import { ICommentData } from "@/type";
+import { textRating } from "@/utils/rating.util";
 
 const CallComponent: FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -76,6 +78,8 @@ const CallComponent: FC = () => {
       if (!edit) {
         dispatch(addComment(commentData));
         setCurrentTestimonial(comments.length);
+      } else {
+        dispatch(editComment(commentData));
       }
       setShowNotification(true);
       setTimeout(() => {
@@ -277,6 +281,11 @@ const CallComponent: FC = () => {
                         </svg>
                       )
                     )}
+                  </div>
+                  <div className="text-primary mb-5">
+                    <p className="text-xs">
+                      {textRating(comments[currentTestimonial].rating)}{" "}
+                    </p>
                   </div>
                   <p className="font-montserrat text-accent-light italic mb-2 text-sm">
                     &ldquo;{comments[currentTestimonial].quote}&rdquo;

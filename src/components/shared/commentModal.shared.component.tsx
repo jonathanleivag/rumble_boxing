@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { CommentModalProps, ICommentData } from "@/type";
 import { textRating } from "@/utils/rating.util";
-import { addComment } from "@/lib/db/comment/actions";
+import { addComment, editComment } from "@/lib/db/comment/actions";
 
 const CommentModal: FC<CommentModalProps> = ({
   isOpen,
@@ -37,7 +37,11 @@ const CommentModal: FC<CommentModalProps> = ({
           rating,
         });
       } else {
-        data = {} as ICommentData;
+        data = await editComment(session?.user?.email || "", {
+          quote: comment,
+          textRating: textRating(rating),
+          rating,
+        });
       }
 
       onSubmit(data);
@@ -79,7 +83,7 @@ const CommentModal: FC<CommentModalProps> = ({
                 COMPARTE TU EXPERIENCIA
               </h2>
               <button
-                className="text-accent-medium hover:text-white transition-colors"
+                className="text-accent-medium hover:text-white transition-colors cursor-pointer"
                 onClick={onClose}
               >
                 <svg
@@ -209,14 +213,14 @@ const CommentModal: FC<CommentModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="font-oswald bg-accent-dark/70 hover:bg-accent-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300"
+                  className="font-oswald bg-accent-dark/70 hover:bg-accent-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 cursor-pointer"
                 >
                   CANCELAR
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group"
+                  className="font-oswald bg-primary hover:bg-primary-dark text-white py-2 px-5 rounded-full text-sm uppercase tracking-wider transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 relative overflow-hidden group cursor-pointer"
                 >
                   <span className="relative z-10 flex items-center">
                     {isSubmitting ? (

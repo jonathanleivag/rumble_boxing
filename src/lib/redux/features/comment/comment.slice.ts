@@ -16,9 +16,17 @@ export const commentSlice = createSlice({
     addComment: (state, action: PayloadAction<ICommentData>) => {
       state.comments.push(action.payload as WritableDraft<ICommentData>);
     },
+    editComment: (state, action: PayloadAction<ICommentData>) => {
+      const index = state.comments.findIndex(
+        (comment) => comment._id === action.payload._id
+      );
+      if (index !== -1) {
+        state.comments[index] = action.payload as WritableDraft<ICommentData>;
+      }
+    },
   },
 });
 
-export const { initialComment, addComment } = commentSlice.actions;
+export const { initialComment, addComment, editComment } = commentSlice.actions;
 
 export default commentSlice.reducer;

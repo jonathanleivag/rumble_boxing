@@ -88,3 +88,38 @@ export const oneComment = async (
     return null;
   }
 };
+
+export const editComment = async (
+  email: string,
+  data: TestimonialComment
+): Promise<ICommentData> => {
+  await connectToMongoDB();
+  try {
+    const comment = await Comment.findOneAndUpdate(
+      { email },
+      { ...data },
+      { new: true }
+    );
+
+    if (!comment) {
+      throw new Error("Comentario no encontrado");
+    }
+
+    return {
+      _id: comment.id.toString(),
+      name: comment.name,
+      email: comment.email,
+      quote: comment.quote,
+      createdAt: new Date(comment.createdAt).toISOString(),
+      updatedAt: new Date(comment.updatedAt).toISOString(),
+      image: comment.image || "",
+      rating: comment.rating,
+      textRating: comment.textRating || "",
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error al editar el comentario:", error.message);
+    }
+    throw new Error("Error al editar el comentario");
+  }
+};
