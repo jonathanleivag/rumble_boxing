@@ -235,7 +235,9 @@ const CallComponent: FC = () => {
                     </p>
                     <p className="font-montserrat text-accent-medium text-xs">
                       {testimonials[currentTestimonial].createdAt
-                        ? new Date(testimonials[currentTestimonial].createdAt).toLocaleDateString()
+                        ? new Date(
+                            testimonials[currentTestimonial].createdAt
+                          ).toLocaleDateString()
                         : ""}
                     </p>
                   </div>
@@ -243,113 +245,114 @@ const CallComponent: FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
-
-          <div className="flex justify-between items-center mt-6">
-            <button
-              onClick={prevTestimonial}
-              className="w-8 h-8 rounded-full bg-accent-dark/50 text-white hover:bg-primary/30 transition-colors flex items-center justify-center"
-              aria-label="Testimonio anterior"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M15 18L9 12L15 6"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
-            <div className="flex justify-center gap-2 items-center">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToTestimonial(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    currentTestimonial === index
-                      ? "w-8 bg-primary"
-                      : "w-2 bg-accent-medium/50"
-                  }`}
-                  aria-label={`Ir al testimonio ${index + 1}`}
-                ></button>
-              ))}
+          {testimonials.length !== 0 && (
+            <div className="flex justify-between items-center mt-6">
               <button
-                onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-                className="ml-2 w-6 h-6 rounded-full bg-accent-dark/70 hover:bg-primary/30 text-white transition-colors flex items-center justify-center"
-                aria-label={
-                  isAutoPlaying
-                    ? "Pausar reproducción automática"
-                    : "Activar reproducción automática"
-                }
+                onClick={prevTestimonial}
+                className="w-8 h-8 rounded-full bg-accent-dark/50 text-white hover:bg-primary/30 transition-colors flex items-center justify-center"
+                aria-label="Testimonio anterior"
               >
-                {isAutoPlaying ? (
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <rect
-                      x="6"
-                      y="4"
-                      width="4"
-                      height="16"
-                      rx="1"
-                      fill="currentColor"
-                    />
-                    <rect
-                      x="14"
-                      y="4"
-                      width="4"
-                      height="16"
-                      rx="1"
-                      fill="currentColor"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    width="10"
-                    height="10"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M5 4v16l16-8-16-8z" fill="currentColor" />
-                  </svg>
-                )}
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              <div className="flex justify-center gap-2 items-center">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToTestimonial(index)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      currentTestimonial === index
+                        ? "w-8 bg-primary"
+                        : "w-2 bg-accent-medium/50"
+                    }`}
+                    aria-label={`Ir al testimonio ${index + 1}`}
+                  ></button>
+                ))}
+                <button
+                  onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+                  className="ml-2 w-6 h-6 rounded-full bg-accent-dark/70 hover:bg-primary/30 text-white transition-colors flex items-center justify-center"
+                  aria-label={
+                    isAutoPlaying
+                      ? "Pausar reproducción automática"
+                      : "Activar reproducción automática"
+                  }
+                >
+                  {isAutoPlaying ? (
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect
+                        x="6"
+                        y="4"
+                        width="4"
+                        height="16"
+                        rx="1"
+                        fill="currentColor"
+                      />
+                      <rect
+                        x="14"
+                        y="4"
+                        width="4"
+                        height="16"
+                        rx="1"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M5 4v16l16-8-16-8z" fill="currentColor" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+
+              <button
+                onClick={nextTestimonial}
+                className="w-8 h-8 rounded-full bg-accent-dark/50 text-white hover:bg-primary/30 transition-colors flex items-center justify-center"
+                aria-label="Siguiente testimonio"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9 6L15 12L9 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </div>
-
-            <button
-              onClick={nextTestimonial}
-              className="w-8 h-8 rounded-full bg-accent-dark/50 text-white hover:bg-primary/30 transition-colors flex items-center justify-center"
-              aria-label="Siguiente testimonio"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M9 6L15 12L9 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
+          )}
 
           <div className="mt-8 pt-6 border-t border-accent-dark/30 flex justify-center">
             {session && (
