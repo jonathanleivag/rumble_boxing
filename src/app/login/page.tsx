@@ -29,18 +29,16 @@ const LoginPage: FC = () => {
         setError("Credenciales inválidas. Por favor intenta de nuevo.");
         setIsLoading(false);
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (error) {
+      console.log("Error during sign-in:", error);
+
       setError(
         "Ocurrió un error al iniciar sesión. Intenta de nuevo más tarde."
       );
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/auth/callback" });
   };
 
   return (
