@@ -53,4 +53,18 @@ export const authOptions: NextAuthOptions = {
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
   },
+  callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        token.provider = account.provider;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (typeof token?.provider === "string") {
+        session.provider = token.provider;
+      }
+      return session;
+    },
+  },
 };

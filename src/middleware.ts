@@ -10,15 +10,15 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  if (!token && pathname.startsWith("/dashboard")) {
-    const loginUrl = new URL("/login", req.url);
-    return NextResponse.redirect(loginUrl);
-  }
+  const isProtectedRoute = pathname.startsWith("/dashboard");
 
-  if (token && pathname === "/login") {
-    const dashboardUrl = new URL("/dashboard", req.url);
-    return NextResponse.redirect(dashboardUrl);
+  if ((!token || token.provider !== "credentials") && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/dashboard/:path*", "/login"],
+};

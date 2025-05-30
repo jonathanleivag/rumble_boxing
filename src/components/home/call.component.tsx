@@ -416,7 +416,7 @@ const CallComponent: FC = () => {
           )}
 
           <div className="mt-8 pt-6 border-t border-accent-dark/30 flex justify-center">
-            {session && (
+            {session && session?.provider === "google" && (
               <div className="flex flex-col items-center gap-4">
                 <button
                   onClick={openCommentModal}
@@ -448,7 +448,7 @@ const CallComponent: FC = () => {
                 </button>
               </div>
             )}
-            {!session && (
+            {session?.provider !== "google" && (
               <div className="flex flex-col items-center gap-3">
                 <p className="text-accent-light font-oswald text-sm">
                   Inicia sesión para comentar y compartir tu experiencia
