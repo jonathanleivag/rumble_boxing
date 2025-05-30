@@ -114,7 +114,7 @@ const AboutComponent: FC = () => {
             <div className="absolute -top-2 -left-2 w-32 h-32 border-4 border-primary opacity-40 rounded-bl-3xl"></div>
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/50 to-transparent opacity-70"></div>
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity duration-300">
             <motion.div
               whileHover={{ scale: 1.1 }}
               className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center cursor-pointer hover:bg-primary transition-colors duration-300 shadow-lg shadow-primary/30"
