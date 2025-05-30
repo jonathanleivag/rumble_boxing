@@ -1,9 +1,23 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
-  "files.autoSave": "onWindowChange",
   "css.lint.unknownAtRules": "ignore",
   "cSpell.language": "en, es",
-  "cSpell.words": ["tailwindcss"]
+  "cSpell.words": [
+    "alejandro",
+    "facebook",
+    "googleusercontent",
+    "HIIT",
+    "INSCRÍBETE",
+    "instagram",
+    "Lupcke",
+    "mongodb",
+    "MONGODB",
+    "nextauth",
+    "NEXTAUTH",
+    "nodownload",
+    "saturday",
+    "tailwindcss",
+    "whatsapp"
+  ]
 }
