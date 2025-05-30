@@ -24,6 +24,11 @@ export interface CommentModalProps {
   edit: boolean;
 }
 
+export interface IData {
+  _id: Types.ObjectId;
+  createdAt: string;
+  updatedAt: string;
+}
 export interface IComment {
   name: string;
   quote: string;
@@ -33,14 +38,18 @@ export interface IComment {
   rating: number;
 }
 
-export interface ICommentData extends IComment {
-  _id: Types.ObjectId;
-  createdAt: string;
-  updatedAt: string;
-}
-
+export interface ICommentData extends IData, IComment {}
 export interface ICommentSlice {
   comments: ICommentData[];
 }
 
 export interface ICommentDocument extends ICommentData, Document {}
+
+export interface IUser {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface IUserData extends IData, IUser {}
+export interface IUserDocument extends IUserData, Document {}

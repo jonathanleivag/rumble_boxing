@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Bebas_Neue, Oswald, Montserrat } from "next/font/google";
 import "./globals.css";
-import BodyLayoutComponent from "@/components/layouts/body.layout.component";
 import { connectToMongoDB } from "@/lib/db/mongoose";
+import ProviderLayoutComponent from "@/components/layouts/provider.layout.component";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -39,7 +39,9 @@ export default function RootLayout({
       lang="es"
       className={`${bebasNeue.variable} ${oswald.variable} ${montserrat.variable}`}
     >
-      <BodyLayoutComponent>{children}</BodyLayoutComponent>
+      <body className="font-montserrat bg-boxing-black text-boxing-white">
+        <ProviderLayoutComponent>{children}</ProviderLayoutComponent>
+      </body>
     </html>
   );
 }

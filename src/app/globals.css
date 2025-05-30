@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Font families */
   --font-bebas-neue: var(--font-bebas-neue);
   --font-oswald: var(--font-oswald);
   --font-montserrat: var(--font-montserrat);
@@ -21,7 +20,6 @@
 }
 
 @theme inline {
-  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -35,30 +33,23 @@
   --color-accent-medium: var(--accent-medium);
   --color-accent-dark: var(--accent-dark);
 
-  /* Fonts */
   --font-heading: var(--font-bebas-neue);
   --font-subheading: var(--font-oswald);
   --font-body: var(--font-montserrat);
 }
 
-/* Boxing Gym Font Utility Classes */
-
-/* Headline Font - Bebas Neue */
 .font-bebas {
   font-family: var(--font-bebas-neue);
 }
 
-/* Subheading Font - Oswald */
 .font-oswald {
   font-family: var(--font-oswald);
 }
 
-/* Body Font - Montserrat */
 .font-montserrat {
   font-family: var(--font-montserrat);
 }
 
-/* Typography Styles */
 h1,
 .h1 {
   font-family: var(--font-bebas-neue);
@@ -94,7 +85,6 @@ h4,
   line-height: 1.3;
 }
 
-/* Fighting-inspired text styles */
 .text-knockout {
   font-family: var(--font-bebas-neue);
   font-size: 4rem;
@@ -124,7 +114,6 @@ h4,
   display: inline-block;
 }
 
-/* Text shadow classes for better readability over video backgrounds */
 .text-shadow-sm {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
@@ -137,7 +126,6 @@ h4,
   text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Animación personalizada para el logo en el hero */
 @keyframes pulse-slow {
   0%,
   100% {
