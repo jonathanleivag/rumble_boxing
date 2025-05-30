@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { CommentModalProps, ICommentData } from "@/type";
 import { textRating } from "@/utils/rating.util";
-import { addComment, editComment } from "@/lib/db/comment/actions";
+import { addComment, editComment } from "@/lib/db/actions/comment.action";
 
 const CommentModal: FC<CommentModalProps> = ({
   isOpen,

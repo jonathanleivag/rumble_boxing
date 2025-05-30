@@ -11,7 +11,7 @@ import CommentModal from "../shared/commentModal.shared.component";
 import LoginButton from "../auth/login-button";
 import { signOut, useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { getComments, oneComment } from "@/lib/db/comment/actions";
+import { getComments, oneComment } from "@/lib/db/actions/comment.action";
 import {
   addComment,
   editComment,
