@@ -32,15 +32,13 @@ const LoginPage: FC = () => {
         router.push("/");
       }
     } catch (error) {
+      console.log("Error during sign-in:", error);
+
       setError(
         "Ocurrió un error al iniciar sesión. Intenta de nuevo más tarde."
       );
       setIsLoading(false);
     }
-  };
-
-  const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/auth/callback" });
   };
 
   return (

@@ -1,5 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { login } from "./db/actions/user.action";
 
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   throw new Error("Google Client ID and Secret must be provided");
@@ -14,6 +16,34 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text", placeholder: "Email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials || !credentials.email || !credentials.password) {
+          throw new Error("Email and password are required");
+        }
+        const { email, password } = credentials;
+
+        try {
+          const userDoc = await login(email, password);
+          if (!userDoc) return null;
+          return {
+            id: userDoc._id?.toString(),
+            name: userDoc.name,
+            email: userDoc.email,
+          };
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error("Authorization error:", error.message);
+          }
+          return null;
+        }
+      },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
