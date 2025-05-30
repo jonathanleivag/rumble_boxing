@@ -29,7 +29,7 @@ const LoginPage: FC = () => {
         setError("Credenciales inválidas. Por favor intenta de nuevo.");
         setIsLoading(false);
       } else {
-        router.push("/");
+        router.push("/dashboard");
       }
     } catch (error) {
       console.log("Error during sign-in:", error);
