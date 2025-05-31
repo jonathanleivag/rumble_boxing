@@ -29,6 +29,7 @@ const UsuariosPage: FC = () => {
   const [filterEstado, setFilterEstado] = useState("");
   const [sortBy, setSortBy] = useState("nombre");
   const [showModal, setShowModal] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null);
   const [usuarioEditado, setUsuarioEditado] = useState<Usuario | null>(null);
 
@@ -63,6 +64,17 @@ const UsuariosPage: FC = () => {
       duracion: "12 meses",
     },
   ];
+
+  const [nuevoUsuario, setNuevoUsuario] = useState<Omit<Usuario, "id">>({
+    nombre: "",
+    email: "",
+    telefono: "",
+    fechaRegistro: new Date().toLocaleDateString("es-ES"),
+    plan: planes[0], // Plan básico por defecto
+    asistencias: 0,
+    estado: "activo",
+    avatar: "/default-avatar.png",
+  });
 
   // Datos simulados de usuarios
   const usuarios: Usuario[] = [
@@ -174,6 +186,39 @@ const UsuariosPage: FC = () => {
     // En una implementación real, aquí se actualizaría la base de datos
   };
 
+  // Manejar la creación de un nuevo usuario
+  const handleAddUser = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Generar un ID único para el nuevo usuario
+    const newId = `u${Date.now()}`;
+
+    // Crear el nuevo usuario con los datos del formulario
+    const newUser: Usuario = {
+      id: newId,
+      ...nuevoUsuario,
+    };
+
+    // Añadir el usuario a la lista (en una implementación real, se enviaría a la API)
+    usuarios.push(newUser);
+
+    // Resetear el formulario y cerrar
+    setNuevoUsuario({
+      nombre: "",
+      email: "",
+      telefono: "",
+      fechaRegistro: new Date().toLocaleDateString("es-ES"),
+      plan: planes[0],
+      asistencias: 0,
+      estado: "activo",
+      avatar: "/default-avatar.png",
+    });
+    setShowAddForm(false);
+
+    console.log("Nuevo usuario creado:", newUser);
+    // En una implementación real, aquí se enviaría a la API
+  };
+
   const getEstadoColor = (estado: string) => {
     switch (estado) {
       case "activo":
@@ -193,7 +238,10 @@ const UsuariosPage: FC = () => {
         <h1 className="font-bebas text-white text-xl sm:text-knockout sm:text-4xl mb-1 sm:mb-0 tracking-wider">
           USUARIOS
         </h1>
-        <button className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center justify-center">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center justify-center"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -210,6 +258,194 @@ const UsuariosPage: FC = () => {
           Nuevo Usuario
         </button>
       </div>
+
+      {/* Formulario para nuevo usuario */}
+      <AnimatePresence>
+        {showAddForm && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm overflow-hidden mb-6"
+          >
+            <div className="p-5">
+              <h2 className="font-oswald text-white text-lg mb-4">
+                Añadir Nuevo Usuario
+              </h2>
+              <form onSubmit={handleAddUser} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="nombre"
+                      className="block text-accent-medium font-montserrat text-xs mb-1"
+                    >
+                      Nombre Completo
+                    </label>
+                    <input
+                      id="nombre"
+                      type="text"
+                      className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      placeholder="Nombre y apellidos"
+                      value={nuevoUsuario.nombre}
+                      onChange={(e) =>
+                        setNuevoUsuario({
+                          ...nuevoUsuario,
+                          nombre: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-accent-medium font-montserrat text-xs mb-1"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      placeholder="correo@ejemplo.com"
+                      value={nuevoUsuario.email}
+                      onChange={(e) =>
+                        setNuevoUsuario({
+                          ...nuevoUsuario,
+                          email: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="telefono"
+                      className="block text-accent-medium font-montserrat text-xs mb-1"
+                    >
+                      Teléfono
+                    </label>
+                    <input
+                      id="telefono"
+                      type="tel"
+                      className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      placeholder="+52 555 123 4567"
+                      value={nuevoUsuario.telefono}
+                      onChange={(e) =>
+                        setNuevoUsuario({
+                          ...nuevoUsuario,
+                          telefono: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="plan"
+                      className="block text-accent-medium font-montserrat text-xs mb-1"
+                    >
+                      Plan
+                    </label>
+                    <select
+                      id="plan"
+                      className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      value={nuevoUsuario.plan.id}
+                      onChange={(e) => {
+                        const selectedPlan = planes.find(
+                          (p) => p.id === e.target.value
+                        );
+                        if (selectedPlan) {
+                          setNuevoUsuario({
+                            ...nuevoUsuario,
+                            plan: selectedPlan,
+                          });
+                        }
+                      }}
+                      required
+                    >
+                      {planes.map((plan) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.nombre} - {plan.clases} clases
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="asistencias"
+                      className="block text-accent-medium font-montserrat text-xs mb-1"
+                    >
+                      Asistencias iniciales
+                    </label>
+                    <input
+                      id="asistencias"
+                      type="number"
+                      className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      placeholder="0"
+                      min="0"
+                      value={nuevoUsuario.asistencias}
+                      onChange={(e) =>
+                        setNuevoUsuario({
+                          ...nuevoUsuario,
+                          asistencias: parseInt(e.target.value) || 0,
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="estado"
+                      className="block text-accent-medium font-montserrat text-xs mb-1"
+                    >
+                      Estado
+                    </label>
+                    <select
+                      id="estado"
+                      className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      value={nuevoUsuario.estado}
+                      onChange={(e) =>
+                        setNuevoUsuario({
+                          ...nuevoUsuario,
+                          estado: e.target.value as
+                            | "activo"
+                            | "inactivo"
+                            | "suspendido",
+                        })
+                      }
+                    >
+                      <option value="activo">Activo</option>
+                      <option value="inactivo">Inactivo</option>
+                      <option value="suspendido">Suspendido</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddForm(false)}
+                    className="bg-accent-dark/60 hover:bg-accent-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
+                  >
+                    Guardar Usuario
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Filtros y búsqueda */}
       <div className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm p-4">
