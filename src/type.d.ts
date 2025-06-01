@@ -53,3 +53,17 @@ export interface IUser {
 
 export interface IUserData extends IData, IUser {}
 export interface IUserDocument extends IUserData, Document {}
+
+export interface IPrice {
+  name: string;
+  type: "mensual" | "anual" | "personalizado";
+  price: number;
+  class: number | string;
+  description: string;
+  characteristics: string[];
+  active: boolean;
+  isPopular: boolean;
+}
+
+export interface IPriceData extends IData, IPrice {}
+export interface IPriceDocument extends IPriceData, Document {}
