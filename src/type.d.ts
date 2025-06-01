@@ -67,3 +67,26 @@ export interface IPrice {
 
 export interface IPriceData extends IData, IPrice {}
 export interface IPriceDocument extends IPriceData, Document {}
+
+export interface PriceFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialData?: IPrice;
+  onSubmit: (data: IPrice) => void;
+}
+
+export interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+}
+
+export interface PriceCardProps {
+  price: IPriceData;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleActive: () => void;
+  onTogglePopular: () => void;
+}
