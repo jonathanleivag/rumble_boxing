@@ -8,13 +8,13 @@ export const createPrice = async (body: IPrice): Promise<IPriceData> => {
   try {
     await connectToMongoDB();
 
-    const price = await Price.findOne({ type: body.type });
+    const price = await Price.findOne({ type: body.type, active: true });
 
     if (price) {
       throw new Error("Ya existe un precio con este tipo");
     }
 
-    const pricePopular = await Price.findOne({ isPopular: true });
+    const pricePopular = await Price.findOne({ isPopular: true, active: true });
     console.log("pricePopular", { pricePopular });
 
     if (body.isPopular && pricePopular) {
@@ -81,13 +81,16 @@ export const putPrice = async (id: string, data: IPrice): Promise<string> => {
     throw new Error("Precio no encontrado");
   }
   if (priceSearch.type !== data.type) {
-    const existingPrice = await Price.findOne({ type: data.type });
+    const existingPrice = await Price.findOne({
+      type: data.type,
+      active: true,
+    });
     if (existingPrice) {
       throw new Error("Ya existe un precio con este tipo");
     }
   }
   if (priceSearch.isPopular && !data.isPopular) {
-    const pricePopular = await Price.findOne({ isPopular: true });
+    const pricePopular = await Price.findOne({ isPopular: true, active: true });
     if (data.isPopular && pricePopular) {
       throw new Error("Ya existe un precio popular");
     }
