@@ -5,52 +5,61 @@ import { Price } from "../models/precio.model";
 import { connectToMongoDB } from "../mongoose";
 
 export const createPrice = async (body: IPrice): Promise<IPriceData> => {
-  try {
-    await connectToMongoDB();
+  await connectToMongoDB();
 
-    const price = await Price.findOne({ type: body.type, active: true });
+  const totalPrices = await Price.countDocuments();
+  if (totalPrices >= 6) {
+    throw new Error("No se pueden tener más de 6 precios en total");
+  }
 
-    if (price) {
-      throw new Error("Ya existe un precio con este tipo");
+  if (body.active) {
+    const existingActivePrice = await Price.findOne({
+      type: body.type,
+      active: true,
+    });
+    if (existingActivePrice) {
+      throw new Error("Ya existe un precio activo con este tipo");
     }
+  }
 
+  if (body.isPopular && body.active) {
     const pricePopular = await Price.findOne({ isPopular: true, active: true });
-    console.log("pricePopular", { pricePopular });
-
-    if (body.isPopular && pricePopular) {
+    if (pricePopular) {
       throw new Error("Ya existe un precio popular");
     }
-
-    const newPrice = await Price.create(body);
-
-    return {
-      _id: newPrice._id,
-      name: newPrice.name,
-      type: newPrice.type,
-      price: newPrice.price,
-      class: newPrice.class,
-      description: newPrice.description,
-      characteristics: newPrice.characteristics,
-      active: newPrice.active,
-      isPopular: newPrice.isPopular,
-      createdAt: newPrice.createdAt,
-      updatedAt: newPrice.updatedAt,
-    };
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error al crear precio:", error.message);
-      throw new Error("Error al crear precio: " + error.message);
-    }
-    console.error("Error al crear precio:", error);
-    throw new Error("Error al crear precio");
   }
+
+  const newPrice = await Price.create(body);
+
+  return {
+    _id: newPrice._id,
+    name: newPrice.name,
+    type: newPrice.type,
+    price: newPrice.price,
+    class: newPrice.class,
+    description: newPrice.description,
+    characteristics: newPrice.characteristics,
+    active: newPrice.active,
+    isPopular: newPrice.isPopular,
+    createdAt: newPrice.createdAt,
+    updatedAt: newPrice.updatedAt,
+  };
 };
 
-export const getPrices = async (): Promise<string> => {
+export const getPrices = async (
+  active: boolean | undefined = undefined
+): Promise<string> => {
   try {
     await connectToMongoDB();
+    let prices: IPriceDocument[];
 
-    const prices: IPriceDocument[] = await Price.find();
+    if (active !== undefined) {
+      prices = await Price.find({ active });
+    } else {
+      prices = await Price.find();
+    }
+
+    prices = await Price.find();
 
     const serializedPrices = prices.map((price) => ({
       _id: price._id,
@@ -80,21 +89,40 @@ export const putPrice = async (id: string, data: IPrice): Promise<string> => {
   if (!priceSearch) {
     throw new Error("Precio no encontrado");
   }
-  if (priceSearch.type !== data.type) {
-    const existingPrice = await Price.findOne({
+
+  if (data.active) {
+    const existingActivePrice = await Price.findOne({
+      _id: { $ne: id },
       type: data.type,
       active: true,
+    });
+    if (existingActivePrice) {
+      throw new Error("Ya existe un precio activo con este tipo");
+    }
+  }
+
+  if (priceSearch.type !== data.type) {
+    const existingPrice = await Price.findOne({
+      _id: { $ne: id },
+      type: data.type,
+      active: data.active,
     });
     if (existingPrice) {
       throw new Error("Ya existe un precio con este tipo");
     }
   }
-  if (priceSearch.isPopular && !data.isPopular) {
-    const pricePopular = await Price.findOne({ isPopular: true, active: true });
-    if (data.isPopular && pricePopular) {
+
+  if (data.isPopular) {
+    const pricePopular = await Price.findOne({
+      _id: { $ne: id },
+      isPopular: true,
+      active: data.active,
+    });
+    if (pricePopular) {
       throw new Error("Ya existe un precio popular");
     }
   }
+
   const updatedPrice = await Price.findByIdAndUpdate(
     id,
     {
@@ -143,6 +171,24 @@ export const patchPrice = async (id: string, action: string) => {
   }
 
   if (action === "toggleActive") {
+    if (price.isPopular && !price.active) {
+      throw new Error("No se puede desactivar un precio popular");
+    }
+
+    const activePrices = await Price.find({ active: true });
+    if (activePrices.length <= 1 && !price.active) {
+      throw new Error("Debe haber al menos un precio activo");
+    }
+
+    // no se puede activar un precio si existe otro precio activo con el mismo tipo
+    const existingPrice = await Price.findOne({
+      type: price.type,
+      active: true,
+    });
+    if (existingPrice && !price.active) {
+      throw new Error("Ya existe un precio activo con este tipo");
+    }
+
     price.active = !price.active;
   } else if (action === "togglePopular") {
     if (!price.isPopular) {

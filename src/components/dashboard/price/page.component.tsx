@@ -70,8 +70,10 @@ const PricePageComponent: FC = () => {
       const dataFetch = await createPrice(data);
       setPrice((prev) => [...prev, dataFetch]);
     } catch (error) {
-      console.error("Error:", error);
-      setError("No se pudo crear el precio. Intenta de nuevo.");
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        setError(error.message);
+      }
     }
   };
 
@@ -79,10 +81,10 @@ const PricePageComponent: FC = () => {
     if (!selectedPrice?._id) return;
 
     try {
+      setShowModal(false);
       const dataFetch = JSON.parse(
         await putPrice(selectedPrice._id.toString(), data)
       );
-      setShowModal(false);
       setPrice((prev) =>
         prev.map((price) =>
           price._id === selectedPrice._id ? dataFetch : price
@@ -90,46 +92,52 @@ const PricePageComponent: FC = () => {
       );
       setSelectedPrice(null);
     } catch (error) {
-      console.error("Error:", error);
-      setError("No se pudo actualizar el precio. Intenta de nuevo.");
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        setError(error.message);
+      }
     }
   };
 
   const handleDeletePrecio = async () => {
     const id = confirmModal.id;
     try {
+      setConfirmModal({ ...confirmModal, show: false });
       const data = await deletePrice(id);
       setPrice((prev) => prev.filter((price) => price._id.toString() !== data));
-      setConfirmModal({ ...confirmModal, show: false });
     } catch (error) {
-      console.error("Error:", error);
-      setError("No se pudo eliminar el precio. Intenta de nuevo.");
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        setError(error.message);
+      }
     }
   };
 
   const handleToggleActive = async () => {
     const id = confirmModal.id;
     try {
+      setConfirmModal({ ...confirmModal, show: false });
       await patchPrice(id, "toggleActive");
       await fetchPrice();
-      setConfirmModal({ ...confirmModal, show: false });
     } catch (error) {
-      console.error("Error:", error);
-      setError("No se pudo cambiar el estado del precio. Intenta de nuevo.");
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        setError(error.message);
+      }
     }
   };
 
   const handleTogglePopular = async () => {
     const id = confirmModal.id;
     try {
+      setConfirmModal({ ...confirmModal, show: false });
       await patchPrice(id, "togglePopular");
       await fetchPrice();
-      setConfirmModal({ ...confirmModal, show: false });
     } catch (error) {
-      console.error("Error:", error);
-      setError(
-        "No se pudo cambiar el estado destacado del precio. Intenta de nuevo."
-      );
+      if (error instanceof Error) {
+        console.error("Error:", error.message);
+        setError(error.message);
+      }
     }
   };
 
@@ -380,7 +388,18 @@ const PricePageComponent: FC = () => {
           setShowModal(false);
           setSelectedPrice(null);
         }}
-        initialData={selectedPrice || undefined}
+        initialData={
+          selectedPrice || {
+            name: "",
+            type: "mensual",
+            price: 0,
+            class: "",
+            description: "",
+            characteristics: [""],
+            active: true,
+            isPopular: false,
+          }
+        }
         onSubmit={selectedPrice ? handleUpdatePrice : handleCreatePrice}
       />
 

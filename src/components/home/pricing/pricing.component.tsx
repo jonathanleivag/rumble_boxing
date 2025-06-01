@@ -15,7 +15,7 @@ const PricingComponent: FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const pricesData = JSON.parse(await getPrices()) as IPriceData[];
+        const pricesData = JSON.parse(await getPrices(true)) as IPriceData[];
         setPrices(pricesData);
       } catch (error) {
         console.error("Error fetching prices:", error);

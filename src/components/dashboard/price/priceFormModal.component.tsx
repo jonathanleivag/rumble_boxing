@@ -13,7 +13,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
   const [formData, setFormData] = useState<IPrice>({
     name: "",
     type: "mensual",
-    price: 0,
+    price: "",
     class: "",
     description: "",
     characteristics: [""],
@@ -44,9 +44,10 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    const numericValue = value === "" ? "" : Number(value);
     setFormData((prev) => ({
       ...prev,
-      [name]: Number(value),
+      [name]: numericValue,
     }));
   };
 
@@ -172,8 +173,6 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
                   name="price"
                   value={formData.price}
                   onChange={handleNumberChange}
-                  min="0"
-                  required
                   className="w-full bg-[#0f0f0f] border border-accent-dark/50 rounded-md p-2 text-white focus:border-primary outline-none"
                 />
               </div>
