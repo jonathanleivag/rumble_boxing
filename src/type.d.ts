@@ -90,3 +90,9 @@ export interface PriceCardProps {
   onToggleActive: () => void;
   onTogglePopular: () => void;
 }
+
+export interface PriceCardComponentProps {
+  item: IPriceData;
+  isPopular?: boolean;
+  showConsultButton?: boolean;
+}
