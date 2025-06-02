@@ -13,7 +13,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
   const [formData, setFormData] = useState<IPrice>({
     name: "",
     type: "mensual",
-    price: "",
+    price: 0,
     class: "",
     description: "",
     characteristics: [""],
@@ -112,7 +112,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
             </h2>
             <button
               onClick={onClose}
-              className="text-accent-medium hover:text-white"
+              className="text-accent-medium hover:text-white cursor-pointer"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +226,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
                         <button
                           type="button"
                           onClick={() => removeCharacteristics(index)}
-                          className="bg-red-900/20 hover:bg-red-900/40 text-red-500 p-2 rounded-md"
+                          className="bg-red-900/20 hover:bg-red-900/40 text-red-500 p-2 rounded-md cursor-pointer"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -247,7 +247,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
                   <button
                     type="button"
                     onClick={addCharacteristics}
-                    className="bg-primary/20 hover:bg-primary/30 text-primary-light p-2 rounded-md text-sm flex items-center gap-1"
+                    className="bg-primary/20 hover:bg-primary/30 text-primary-light p-2 rounded-md text-sm flex items-center gap-1 cursor-pointer"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -303,13 +303,13 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="bg-transparent border border-accent-dark/60 hover:border-accent-medium text-accent-medium hover:text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
+                className="bg-transparent border border-accent-dark/60 hover:border-accent-medium text-accent-medium hover:text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
+                className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
               >
                 {initialData ? "Actualizar" : "Crear"}
               </button>

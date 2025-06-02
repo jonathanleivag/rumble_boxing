@@ -27,13 +27,13 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
           <div className="flex justify-end gap-2">
             <button
               onClick={onClose}
-              className="bg-transparent border border-accent-dark/60 hover:border-accent-medium text-accent-medium hover:text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
+              className="bg-transparent border border-accent-dark/60 hover:border-accent-medium text-accent-medium hover:text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
             >
               Cancelar
             </button>
             <button
               onClick={onConfirm}
-              className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
+              className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
             >
               Confirmar
             </button>

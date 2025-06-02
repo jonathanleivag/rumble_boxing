@@ -2,12 +2,15 @@ import { PriceCardComponentProps } from "@/type";
 import { fadeInUp } from "@/utils/motionEffect.util";
 import { motion } from "framer-motion";
 import { FC } from "react";
+import { useMatriculaValue } from "@/hooks/useMatriculaValue";
 
 const PriceCard: FC<PriceCardComponentProps> = ({
   item,
   isPopular = false,
   showConsultButton = false,
 }) => {
+  const { value: matriculaValue, description: matriculaDescription } =
+    useMatriculaValue();
   return (
     <motion.div
       variants={fadeInUp}
@@ -51,6 +54,29 @@ const PriceCard: FC<PriceCardComponentProps> = ({
           )}
           {showConsultButton && <>{item.name}</>}
         </div>
+
+        {matriculaValue > 0 && (
+          <div className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-lg p-3 mb-4">
+            <h4 className="text-white text-sm font-oswald uppercase mb-1">
+              Matrícula
+            </h4>
+            <div className="flex items-center justify-center">
+              <span className="text-primary font-bebas text-3xl mr-1">$</span>
+              <span className="text-primary font-bebas text-4xl">
+                {matriculaValue}
+              </span>
+              <span className="text-accent-medium text-xs self-end mb-1 ml-1">
+                (pago único)
+              </span>
+            </div>
+            {matriculaDescription && (
+              <p className="text-xs text-accent-light text-center mt-1">
+                {matriculaDescription}
+              </p>
+            )}
+          </div>
+        )}
+
         <p className="font-montserrat text-accent-medium text-sm">
           {item.description}
         </p>

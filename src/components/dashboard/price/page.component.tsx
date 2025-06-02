@@ -262,7 +262,7 @@ const PricePageComponent: FC = () => {
               setSelectedPrice(null);
               setShowModal(true);
             }}
-            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center"
+            className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center cursor-pointer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -296,7 +296,7 @@ const PricePageComponent: FC = () => {
               setError(null);
               fetchPrice();
             }}
-            className="ml-2 underline"
+            className="ml-2 underline cursor-pointer"
           >
             Reintentar
           </button>
@@ -331,7 +331,7 @@ const PricePageComponent: FC = () => {
                     setSelectedPrice(null);
                     setShowModal(true);
                   }}
-                  className="text-primary hover:underline"
+                  className="text-primary hover:underline cursor-pointer"
                 >
                   crea un nuevo plan
                 </button>

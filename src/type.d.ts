@@ -54,6 +54,14 @@ export interface IUser {
 export interface IUserData extends IData, IUser {}
 export interface IUserDocument extends IUserData, Document {}
 
+export interface IMatricula {
+  value: number;
+  description: string;
+}
+
+export interface IMatriculaData extends IData, IMatricula {}
+export interface IMatriculaDocument extends IMatriculaData, Document {}
+
 export interface IPrice {
   name: string;
   type: "mensual" | "anual" | "personalizado";

@@ -1,8 +1,7 @@
-"use client";
-
 import { PriceCardProps } from "@/type";
 import { motion } from "framer-motion";
 import { FC } from "react";
+import { useMatriculaValue } from "@/hooks/useMatriculaValue";
 
 const PriceCard: FC<PriceCardProps> = ({
   price,
@@ -11,6 +10,8 @@ const PriceCard: FC<PriceCardProps> = ({
   onToggleActive,
   onTogglePopular,
 }) => {
+  const { value: matriculaValue, description: matriculaDescription } =
+    useMatriculaValue();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -59,6 +60,31 @@ const PriceCard: FC<PriceCardProps> = ({
           </span>
         </div>
 
+        {matriculaValue > 0 && (
+          <div
+            className={`mb-3 px-3 py-2 bg-[#0d0d0d] rounded-md border border-primary/10`}
+          >
+            <h4 className="text-primary text-sm font-montserrat font-medium mb-1">
+              Matrícula
+            </h4>
+            <div
+              className={`font-oswald ${
+                price.active ? "text-white" : "text-accent-medium"
+              }`}
+            >
+              <span className="text-2xl">${matriculaValue}</span>
+              <span className="text-accent-medium text-xs ml-1">
+                pago único
+              </span>
+            </div>
+            {matriculaDescription && (
+              <p className="text-accent-medium text-xs mt-1">
+                {matriculaDescription}
+              </p>
+            )}
+          </div>
+        )}
+
         <div
           className={`mb-4 text-sm ${
             price.active ? "text-accent-light" : "text-accent-medium"
@@ -99,7 +125,7 @@ const PriceCard: FC<PriceCardProps> = ({
         <div className="mt-5 flex flex-wrap gap-2">
           <button
             onClick={onEdit}
-            className="bg-accent-dark/40 hover:bg-accent-dark/60 text-white py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1"
+            className="bg-accent-dark/40 hover:bg-accent-dark/60 text-white py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1 cursor-pointer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +144,7 @@ const PriceCard: FC<PriceCardProps> = ({
               price.active
                 ? "bg-red-900/20 hover:bg-red-900/40 text-red-500"
                 : "bg-green-900/20 hover:bg-green-900/40 text-green-500"
-            } py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1`}
+            } py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1 cursor-pointer`}
           >
             {price.active ? (
               <>
@@ -160,7 +186,7 @@ const PriceCard: FC<PriceCardProps> = ({
               price.isPopular
                 ? "bg-purple-900/20 hover:bg-purple-900/40 text-purple-500"
                 : "bg-accent-dark/40 hover:bg-accent-dark/60 text-accent-light"
-            } py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1`}
+            } py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1 cursor-pointer`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -178,7 +204,7 @@ const PriceCard: FC<PriceCardProps> = ({
           </button>
           <button
             onClick={onDelete}
-            className="bg-red-900/20 hover:bg-red-900/40 text-red-500 py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1"
+            className="bg-red-900/20 hover:bg-red-900/40 text-red-500 py-2 px-3 rounded-md text-xs font-oswald uppercase tracking-wider transition-all duration-300 flex items-center gap-1 cursor-pointer"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

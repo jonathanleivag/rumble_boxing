@@ -1,15 +1,20 @@
 "use client";
 
 import { getPrices } from "@/lib/db/actions/price.action";
-import { IPriceData } from "@/type";
+import { IMatricula, IPriceData } from "@/type";
 import { fadeInUp, staggerContainer } from "@/utils/motionEffect.util";
 import { motion } from "framer-motion";
 import { FC, useEffect, useState, useMemo } from "react";
 import PriceCard from "./priceCard.component";
+import { getMatricula } from "@/lib/db/actions/matricula.action";
 
 const PricingComponent: FC = () => {
   const [prices, setPrices] = useState<IPriceData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [matricula, setMatricula] = useState<IMatricula>({
+    value: 0,
+    description: "Pago único de inscripción",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,6 +30,22 @@ const PricingComponent: FC = () => {
     };
 
     void fetchData();
+  }, []);
+
+  useEffect(() => {
+    const dataFetch = async () => {
+      const data = await getMatricula();
+      if (data) {
+        setMatricula(data);
+      } else {
+        setMatricula({
+          value: 0,
+          description: "Pago único de inscripción",
+        });
+      }
+    };
+    void dataFetch();
+    return () => {};
   }, []);
 
   const { standardPrices, popularPrice, consultPrice } = useMemo(() => {
@@ -102,9 +123,9 @@ const PricingComponent: FC = () => {
             <span className="font-oswald text-primary text-lg mr-2">
               MATRÍCULA:
             </span>
-            <span className="text-white font-semibold">$50</span>
+            <span className="text-white font-semibold">${matricula.value}</span>
             <span className="text-accent-medium text-sm ml-2">
-              (pago único al inscribirte)
+              ({matricula.description})
             </span>
           </p>
         </motion.div>
