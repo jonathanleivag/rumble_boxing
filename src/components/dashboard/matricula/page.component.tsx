@@ -8,7 +8,6 @@ import {
   getMatricula,
   updateMatricula,
 } from "@/lib/db/actions/matricula.action";
-import { IMatriculaData } from "@/type";
 
 interface MatriculaData {
   _id?: string;
