@@ -1,3 +1,4 @@
+import { getMatricula } from "@/lib/db/actions/matricula.action";
 import { useState, useEffect } from "react";
 
 export const useMatriculaValue = () => {
@@ -11,18 +12,12 @@ export const useMatriculaValue = () => {
   useEffect(() => {
     const fetchMatricula = async () => {
       try {
-        const response = await fetch("/api/matricula");
+        const data = await getMatricula();
 
-        if (!response.ok) {
-          throw new Error("Error al cargar el valor de la matrícula");
-        }
-
-        const data = await response.json();
-
-        if (data && data.data) {
+        if (data) {
           setMatricula({
-            value: data.data.value || 0,
-            description: data.data.description || "",
+            value: data.value || 0,
+            description: data.description || "",
             isLoading: false,
             error: null,
           });

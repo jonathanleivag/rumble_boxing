@@ -1,20 +1,18 @@
 "use client";
 
 import { getPrices } from "@/lib/db/actions/price.action";
-import { IMatricula, IPriceData } from "@/type";
+import { IPriceData } from "@/type";
 import { fadeInUp, staggerContainer } from "@/utils/motionEffect.util";
 import { motion } from "framer-motion";
 import { FC, useEffect, useState, useMemo } from "react";
 import PriceCard from "./priceCard.component";
-import { getMatricula } from "@/lib/db/actions/matricula.action";
+import { useMatriculaValue } from "@/hooks/useMatriculaValue";
 
 const PricingComponent: FC = () => {
   const [prices, setPrices] = useState<IPriceData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [matricula, setMatricula] = useState<IMatricula>({
-    value: 0,
-    description: "Pago único de inscripción",
-  });
+  const { value: matriculaValue, description: matriculaDescription } =
+    useMatriculaValue();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,22 +28,6 @@ const PricingComponent: FC = () => {
     };
 
     void fetchData();
-  }, []);
-
-  useEffect(() => {
-    const dataFetch = async () => {
-      const data = await getMatricula();
-      if (data) {
-        setMatricula(data);
-      } else {
-        setMatricula({
-          value: 0,
-          description: "Pago único de inscripción",
-        });
-      }
-    };
-    void dataFetch();
-    return () => {};
   }, []);
 
   const { standardPrices, popularPrice, consultPrice } = useMemo(() => {
@@ -112,24 +94,33 @@ const PricingComponent: FC = () => {
           </motion.p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-center mb-10 bg-gradient-to-r from-accent-dark/50 via-primary/20 to-accent-dark/50 py-3 px-4 rounded-lg max-w-3xl mx-auto"
-        >
-          <p className="font-montserrat text-accent-light">
-            <span className="font-oswald text-primary text-lg mr-2">
-              MATRÍCULA:
-            </span>
-            <span className="text-white font-semibold">${matricula.value}</span>
-            <span className="text-accent-medium text-sm ml-2">
-              ({matricula.description})
-            </span>
-          </p>
-        </motion.div>
-
+        <div className="w-full flex flex-row justify-center items-center my-14">
+          <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%]">
+            {matriculaValue > 0 && (
+              <div className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-lg p-3 mb-4">
+                <h4 className="text-white text-sm font-oswald uppercase mb-1">
+                  Matrícula
+                </h4>
+                <div className="flex items-center justify-center">
+                  <span className="text-primary font-bebas text-3xl mr-1">
+                    $
+                  </span>
+                  <span className="text-primary font-bebas text-4xl">
+                    {matriculaValue}
+                  </span>
+                  <span className="text-accent-medium text-xs self-end mb-1 ml-1">
+                    (pago único)
+                  </span>
+                </div>
+                {matriculaDescription && (
+                  <p className="text-xs text-accent-light text-center mt-1">
+                    {matriculaDescription}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
