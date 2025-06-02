@@ -53,3 +53,54 @@ export interface IUser {
 
 export interface IUserData extends IData, IUser {}
 export interface IUserDocument extends IUserData, Document {}
+
+export interface IMatricula {
+  value: number;
+  description: string;
+}
+
+export interface IMatriculaData extends IData, IMatricula {}
+export interface IMatriculaDocument extends IMatriculaData, Document {}
+
+export interface IPrice {
+  name: string;
+  type: "mensual" | "anual" | "personalizado";
+  price: number;
+  class: number | string;
+  description: string;
+  characteristics: string[];
+  active: boolean;
+  isPopular: boolean;
+}
+
+export interface IPriceData extends IData, IPrice {}
+export interface IPriceDocument extends IPriceData, Document {}
+
+export interface PriceFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialData?: IPrice;
+  onSubmit: (data: IPrice) => void;
+}
+
+export interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+}
+
+export interface PriceCardProps {
+  price: IPriceData;
+  onEdit: () => void;
+  onDelete: () => void;
+  onToggleActive: () => void;
+  onTogglePopular: () => void;
+}
+
+export interface PriceCardComponentProps {
+  item: IPriceData;
+  isPopular?: boolean;
+  showConsultButton?: boolean;
+}

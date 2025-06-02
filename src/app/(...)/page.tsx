@@ -3,7 +3,7 @@ import HomeComponent from "@/components/home/hero.component";
 import AboutComponent from "@/components/home/about.component";
 import ClassComponent from "@/components/home/class.component";
 import TrainersComponent from "@/components/home/trainers.component";
-import PricingComponent from "@/components/home/pricing.component";
+import PricingComponent from "@/components/home/pricing/pricing.component";
 import CallComponent from "@/components/home/call.component";
 import CuerdaSharedComponent from "@/components/shared/cuerda.shared.component";
 import QuestionsComponent from "@/components/home/questions.component.";
