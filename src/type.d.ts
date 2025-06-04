@@ -73,7 +73,9 @@ export interface IPrice {
   isPopular: boolean;
 }
 
-export interface IPriceData extends IData, IPrice {}
+export interface IPriceData extends IData, IPrice {
+  id: string;
+}
 export interface IPriceDocument extends IPriceData, Document {}
 
 export interface PriceFormModalProps {
@@ -104,3 +106,30 @@ export interface PriceCardComponentProps {
   isPopular?: boolean;
   showConsultButton?: boolean;
 }
+
+export interface FormUserComponentProps {
+  showAddForm?: boolean;
+  setShowAddForm: Dispatch<SetStateAction<boolean>>;
+  planes: IPriceData[];
+}
+
+export type StatusStudent = "activo" | "inactivo" | "suspendido";
+
+export interface IStudent {
+  name: string;
+  email: string;
+  rut: string;
+  phone: string;
+  createDate: string;
+  plan: IPriceData;
+  assistance: number;
+  status: StatusStudent;
+  avatar?: string;
+}
+
+export type IStudentDTO = Omit<IStudent, "plan"> & {
+  plan: Types.ObjectId;
+};
+
+export interface IStudentData extends IData, IStudent {}
+export interface IStudentDocument extends IStudentData, Document {}

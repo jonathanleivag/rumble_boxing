@@ -200,3 +200,27 @@ export const patchPrice = async (id: string, action: string) => {
   }
   await price.save();
 };
+
+export const getPriceById = async (
+  id: string
+): Promise<Omit<IPriceData, "id">> => {
+  await connectToMongoDB();
+
+  const price = await Price.findById(id);
+  if (!price) {
+    throw new Error("Precio no encontrado");
+  }
+  return {
+    _id: price._id,
+    name: price.name,
+    type: price.type,
+    price: price.price,
+    class: price.class,
+    description: price.description,
+    characteristics: price.characteristics,
+    active: price.active,
+    isPopular: price.isPopular,
+    createdAt: price.createdAt?.toString?.() ?? null,
+    updatedAt: price.updatedAt?.toString?.() ?? null,
+  };
+};

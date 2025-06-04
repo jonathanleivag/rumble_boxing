@@ -9,6 +9,9 @@ const requiredEnv = [
   "GOOGLE_CLIENT_SECRET",
   "NEXTAUTH_SECRET",
   "MONGODB_URI",
+  "CLOUDINARY_CLOUD_NAME",
+  "CLOUDINARY_API_KEY",
+  "CLOUDINARY_API_SECRET",
 ];
 
 requiredEnv.forEach((envVar) => {
@@ -23,6 +26,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
       },
     ],
   },
