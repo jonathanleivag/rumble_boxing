@@ -4,7 +4,7 @@ import { IPriceData, IStudentData, IStudentDTO } from "@/type";
 import { connectToMongoDB } from "../mongoose";
 import { Student } from "../models/student.model";
 import { getPriceById } from "./price.action";
-import { PaginateResult } from "mongoose";
+import { PaginateResult, Types } from "mongoose";
 
 export const crearStudent = async (
   data: IStudentDTO
@@ -18,6 +18,7 @@ export const crearStudent = async (
   }
 
   const plan = await getPriceById(data.plan.toString());
+  console.log("🚀 ~ data.plan:", data.plan);
 
   if (data.avatar === "") delete data.avatar;
 
@@ -89,5 +90,67 @@ export const getAllStudents = async (
   return {
     ...students,
     docs: serializedDocs,
+  };
+};
+
+export const updateStudent = async (
+  id: string,
+  data: IStudentDTO
+): Promise<IStudentData> => {
+  await connectToMongoDB();
+  const student = await Student.findById(id).populate("plan");
+  if (!student) {
+    throw new Error("Estudiante no encontrado");
+  }
+
+  const plan = await getPriceById(data.plan!.toString());
+
+  const updateStudent = await Student.findByIdAndUpdate(
+    id,
+    {
+      ...data,
+      plan,
+    },
+    { new: true, runValidators: true }
+  );
+
+  if (!updateStudent) {
+    throw new Error("Error al actualizar el estudiante");
+  }
+
+  const studentData = await Student.findById(updateStudent.id).populate("plan");
+
+  if (!studentData) {
+    throw new Error("Estudiante no encontrado después de la actualización");
+  }
+
+  return {
+    _id: studentData._id,
+    name: studentData.name,
+    email: studentData.email,
+    rut: studentData.rut,
+    phone: studentData.phone,
+    createDate: studentData.createDate,
+    plan: {
+      _id: (studentData.plan as IPriceData)._id,
+      id: (studentData.plan as IPriceData)._id.toString?.(),
+      name: (studentData.plan as IPriceData).name,
+      price: (studentData.plan as IPriceData).price,
+      type: (studentData.plan as IPriceData).type,
+      class: (studentData.plan as IPriceData).class,
+      description: (studentData.plan as IPriceData).description,
+      characteristics: (studentData.plan as IPriceData).characteristics,
+      active: (studentData.plan as IPriceData).active,
+      createdAt:
+        (studentData.plan as IPriceData).createdAt?.toString?.() ?? null,
+      updatedAt:
+        (studentData.plan as IPriceData).updatedAt?.toString?.() ?? null,
+      isPopular: (studentData.plan as IPriceData).isPopular,
+    },
+    assistance: studentData.assistance,
+    status: studentData.status,
+    avatar: studentData.avatar,
+    createdAt: studentData.createdAt?.toString?.() ?? null,
+    updatedAt: studentData.updatedAt?.toString?.() ?? null,
   };
 };

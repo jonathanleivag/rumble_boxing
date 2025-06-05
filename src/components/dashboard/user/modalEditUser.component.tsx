@@ -1,9 +1,15 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { FC } from "react";
+import { FC, useRef, useState } from "react";
 import Image from "next/image";
 import { ModalEditUserComponentProps } from "@/type";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { toast } from "react-hot-toast";
+import { updateStudent } from "@/lib/db/actions/student.action";
+import { Types } from "mongoose";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { updateStudent as updateStudentRedux } from "@/lib/redux/features/student/student.slice";
 
 const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
   setShowModal,
@@ -12,9 +18,88 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
   setUsuarioEditado,
   planes,
 }) => {
-  const handleSaveUser = () => {
-    console.log("Guardando usuario:", usuarioEditado);
-    setShowModal(false);
+  const { uploadImage, isUploading } = useImageUpload();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && usuarioEditado) {
+      setSelectedImage(file);
+
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
+    }
+  };
+
+  const handleSaveUser = async () => {
+    if (!usuarioEditado) return;
+
+    setIsSaving(true);
+
+    try {
+      let finalAvatarUrl = usuarioEditado.avatar;
+
+      if (selectedImage) {
+        const imageUrl = await uploadImage(selectedImage);
+        if (imageUrl) {
+          finalAvatarUrl = imageUrl;
+        } else {
+          throw new Error("Error al subir la imagen");
+        }
+      }
+
+      let validCreateDate = usuarioEditado.createDate
+        ? new Date(usuarioEditado.createDate)
+        : new Date();
+
+      const minDate = new Date("2000-01-01");
+      const maxDate = new Date();
+
+      if (validCreateDate < minDate) {
+        validCreateDate = minDate;
+      } else if (validCreateDate > maxDate) {
+        validCreateDate = maxDate;
+      }
+
+      const formattedUser = {
+        ...usuarioEditado,
+        createDate: validCreateDate.toISOString(),
+        avatar: finalAvatarUrl,
+      };
+
+      const fetchStudent = await updateStudent(formattedUser._id.toString(), {
+        name: formattedUser.name,
+        email: formattedUser.email,
+        phone: formattedUser.phone,
+        rut: formattedUser.rut,
+        createDate: formattedUser.createDate,
+        plan: new Types.ObjectId(formattedUser.plan._id),
+        assistance: formattedUser.assistance,
+        status: formattedUser.status,
+        avatar: formattedUser.avatar,
+      });
+
+      dispatch(updateStudentRedux(fetchStudent));
+
+      setSelectedImage(null);
+      setImagePreview(null);
+
+      toast.success("Usuario actualizado correctamente");
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error al guardar usuario:", error);
+      toast.error("Error al actualizar el usuario");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -53,35 +138,83 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
             </div>
 
             <div className="space-y-5">
-              <div className="flex justify-center mb-8">
+              <div className="flex flex-col items-center justify-center mb-8">
                 <div className="relative group">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary-dark rounded-full opacity-70 blur-sm group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 rounded-full z-10 flex items-center justify-center transition-opacity duration-300">
+                    <span className="text-white text-xs font-montserrat font-semibold">
+                      Cambiar imagen
+                    </span>
+                  </div>
                   <Image
-                    src={
-                      usuarioEditado.avatar ||
-                      "https://res.cloudinary.com/dq8fpb695/image/upload/v1748900421/rumble/yfwwjdnhstzsmx2nuazq.webp"
-                    }
+                    src={imagePreview || (usuarioEditado.avatar as string)}
                     alt={usuarioEditado.name}
                     width={100}
                     height={100}
-                    className="rounded-full border-2 border-primary object-cover relative z-10"
+                    onClick={handleImageClick}
+                    className={`w-24 h-24 rounded-full object-cover aspect-square relative z-10 cursor-pointer transition-shadow duration-300 ${
+                      selectedImage
+                        ? "ring-2 ring-yellow-500 shadow-md"
+                        : "border-2 border-primary"
+                    }`}
                   />
-                  <button className="absolute bottom-0 right-0 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white p-1.5 rounded-full z-20 transition-colors duration-300 shadow-lg hover:shadow-xl">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-4 h-4"
-                    >
-                      <path d="M21 14h-6.35a1 1 0 0 0-.713.293l-.354.353a1 1 0 0 1-1.412 0l-.354-.353a1 1 0 0 0-.713-.293H5a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1z" />
-                      <path d="M10.39 13.39l4.2-4.2a1 1 0 0 1 1.4 0l.6.6a1 1 0 0 1 0 1.4l-4.2 4.2a1 1 0 0 1-.7.3H9a1 1 0 0 1-1-1v-2.69a1 1 0 0 1 .29-.71z" />
-                    </svg>
+                  <button
+                    onClick={handleImageClick}
+                    className="absolute bottom-0 right-0 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white p-1.5 rounded-full z-20 transition-colors duration-300 shadow-lg hover:shadow-xl cursor-pointer"
+                  >
+                    {selectedImage ? (
+                      <div className="relative">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-4 h-4"
+                        >
+                          <path d="M15 3h6v6" />
+                          <path d="M10 14L21 3" />
+                          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                        </svg>
+                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                      </div>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-4 h-4"
+                      >
+                        <path d="M15 3h6v6" />
+                        <path d="M10 14L21 3" />
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                      </svg>
+                    )}
                   </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  {(isUploading || (isSaving && selectedImage)) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full z-30">
+                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
                 </div>
+                {selectedImage && (
+                  <div className="text-xs text-yellow-500 mt-2 text-center animate-pulse font-semibold">
+                    Imagen seleccionada - Se subirá al guardar cambios
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gradient-to-br from-accent-dark/30 to-accent-dark/10 p-5 rounded-lg border border-accent-dark/30 shadow-inner">
@@ -181,10 +314,10 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                     Plan
                   </label>
                   <select
-                    value={usuarioEditado.plan.id}
+                    value={usuarioEditado.plan._id.toString()}
                     onChange={(e) => {
                       const selectedPlan = planes.find(
-                        (p) => p.id === e.target.value
+                        (p) => p._id.toString() === e.target.value
                       );
                       if (selectedPlan) {
                         setUsuarioEditado({
@@ -224,40 +357,77 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                   <label className="block text-accent-medium font-montserrat text-xs mb-1">
                     Fecha de Creación
                   </label>
-                  <div className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm">
-                    {new Date(usuarioEditado.createdAt).toLocaleDateString(
-                      "es-ES",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
-                  </div>
-                </div>
-              </div>
+                  <div className="relative group">
+                    {/* Gradient background effect */}
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-primary-dark/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
 
-              <div className="mt-8 pt-6 border-t border-accent-dark/30">
-                <h4 className="font-oswald text-white text-lg mb-4 flex items-center">
-                  <div className="w-1.5 h-6 bg-gradient-to-b from-primary to-primary-dark rounded-sm mr-2"></div>
-                  Historial de Actividad
-                </h4>
-                <div className="bg-gradient-to-br from-accent-dark/40 to-accent-dark/20 rounded-lg p-4 max-h-48 overflow-y-auto shadow-inner border border-accent-dark/40">
-                  <div className="space-y-3">
-                    <div className="flex items-center text-accent-medium font-montserrat text-xs hover:bg-accent-dark/30 p-2 rounded transition-colors">
-                      <span className="w-2 h-2 bg-gradient-to-r from-primary to-primary-dark rounded-full mr-2"></span>
-                      <span className="font-semibold mr-2 text-white/80">
-                        {new Date().toLocaleDateString("es-ES")}
-                      </span>
-                      <span>Usuario registrado en el sistema</span>
+                    <input
+                      type="date"
+                      value={
+                        usuarioEditado.createDate &&
+                        !isNaN(new Date(usuarioEditado.createDate).getTime())
+                          ? new Date(usuarioEditado.createDate)
+                              .toISOString()
+                              .split("T")[0]
+                          : new Date().toISOString().split("T")[0]
+                      }
+                      min="2000-01-01"
+                      max={new Date().toISOString().split("T")[0]}
+                      onChange={(e) =>
+                        setUsuarioEditado({
+                          ...usuarioEditado,
+                          createDate: e.target.value,
+                        })
+                      }
+                      className="relative z-10 w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 group-hover:border-primary/50 transition-colors duration-300"
+                      style={{ colorScheme: "dark" }}
+                    />
+
+                    {/* Calendar icon with gradient */}
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <div className="bg-gradient-to-r from-primary to-primary-dark rounded-full p-1.5 shadow-md">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-3 h-3"
+                        >
+                          <rect
+                            x="3"
+                            y="4"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                          ></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                      </div>
                     </div>
-                    <div className="flex items-center text-accent-medium font-montserrat text-xs hover:bg-accent-dark/30 p-2 rounded transition-colors">
-                      <span className="w-2 h-2 bg-gradient-to-r from-primary to-primary-dark rounded-full mr-2"></span>
-                      <span className="font-semibold mr-2 text-white/80">
-                        {new Date().toLocaleDateString("es-ES")}
-                      </span>
-                      <span>Plan {usuarioEditado.plan.name} asignado</span>
-                    </div>
+                  </div>
+
+                  {/* Formatted date display */}
+                  {usuarioEditado.createDate &&
+                    !isNaN(new Date(usuarioEditado.createDate).getTime()) && (
+                      <div className="text-xs mt-2 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent font-medium">
+                        {new Date(usuarioEditado.createDate).toLocaleDateString(
+                          "es-ES",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
+                      </div>
+                    )}
+                  <div className="text-xs text-accent-medium mt-1 italic">
+                    Fecha entre 2000 y la actualidad
                   </div>
                 </div>
               </div>
@@ -351,14 +521,23 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                 <button
                   onClick={() => setShowModal(false)}
                   className="cursor-pointer bg-accent-dark/60 hover:bg-accent-dark text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md"
+                  disabled={isSaving}
                 >
                   Cerrar
                 </button>
                 <button
                   onClick={handleSaveUser}
-                  className="cursor-pointer bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="cursor-pointer bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+                  disabled={isSaving}
                 >
-                  Guardar Cambios
+                  {isSaving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Guardando...
+                    </>
+                  ) : (
+                    "Guardar Cambios"
+                  )}
                 </button>
               </div>
             </div>

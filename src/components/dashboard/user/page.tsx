@@ -20,7 +20,6 @@ const UserPageComponent: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<IStudentData | null>(null);
   const [usuarioEditado, setUsuarioEditado] = useState<IStudentData | null>(
     null
   );
@@ -60,7 +59,8 @@ const UserPageComponent: FC = () => {
   }, [dispatch, currentPage]);
 
   const openUserModal = (user: IStudentData) => {
-    setSelectedUser(user);
+    console.log("Opening user modal for:", user);
+
     setUsuarioEditado({ ...user });
     setShowModal(true);
   };

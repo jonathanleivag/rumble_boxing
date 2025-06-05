@@ -31,8 +31,13 @@ input[type="date"] {
 /* Cambiar el color del placeholder y los textos en los inputs date */
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
-  opacity: 0.5;
+  opacity: 0;
   cursor: pointer;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  border-radius: 0.5rem;
 }
 
 input[type="date"]::-webkit-datetime-edit {
@@ -52,12 +57,13 @@ input[type="date"]::-webkit-datetime-edit-month-field,
 input[type="date"]::-webkit-datetime-edit-day-field,
 input[type="date"]::-webkit-datetime-edit-year-field {
   color: white;
+  font-weight: 500;
 }
 
 input[type="date"]:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(224, 32, 32, 0.2);
+  box-shadow: 0 0 0 2px rgba(224, 32, 32, 0.3);
 }
 
 input[type="date"]::placeholder {

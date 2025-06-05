@@ -41,9 +41,18 @@ export const studentSlice = createSlice({
         (state.students.page ?? 1) < state.students.totalPages;
       state.students.hasPrevPage = (state.students.page ?? 1) > 1;
     },
+    updateStudent: (state, action: PayloadAction<IStudentData>) => {
+      const index = state.students.docs.findIndex(
+        (student) => student._id === action.payload._id
+      );
+      if (index !== -1) {
+        state.students.docs[index] = action.payload;
+      }
+    },
   },
 });
 
-export const { initialStudents, addStudent } = studentSlice.actions;
+export const { initialStudents, addStudent, updateStudent } =
+  studentSlice.actions;
 
 export default studentSlice.reducer;
