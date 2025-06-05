@@ -7,7 +7,6 @@ const envSchema = z.object({
   NEXT_PUBLIC_MESSAGE: z.string(),
 });
 
-
 export const env = envSchema.parse({
   NEXT_PUBLIC_INSTAGRAM_USERNAME: process.env.NEXT_PUBLIC_INSTAGRAM_USERNAME,
   NEXT_PUBLIC_FACEBOOK_USERNAME: process.env.NEXT_PUBLIC_FACEBOOK_USERNAME,

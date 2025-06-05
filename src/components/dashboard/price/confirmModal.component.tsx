@@ -14,7 +14,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -22,18 +22,21 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
           exit={{ opacity: 0, scale: 0.9 }}
           className="bg-gradient-to-br from-[#101010] to-[#0a0a0a] border border-accent-dark/40 rounded-xl shadow-xl p-6 w-full max-w-md"
         >
-          <h2 className="text-white text-xl font-oswald mb-2">{title}</h2>
+          <h2 className="text-white text-xl font-oswald mb-2 flex items-center">
+            <span className="text-primary mr-2">•</span>
+            {title}
+          </h2>
           <p className="text-accent-medium font-montserrat mb-6">{message}</p>
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3">
             <button
               onClick={onClose}
-              className="bg-transparent border border-accent-dark/60 hover:border-accent-medium text-accent-medium hover:text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
+              className="bg-accent-dark/60 hover:bg-accent-dark text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 shadow-sm hover:shadow-md"
             >
               Cancelar
             </button>
             <button
               onClick={onConfirm}
-              className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-600 text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 shadow-md hover:shadow-lg"
             >
               Confirmar
             </button>

@@ -1,5 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
-import { Document, Types } from "mongoose";
+import { Document, Types, PaginateResult } from "mongoose";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -43,6 +43,10 @@ export interface ICommentSlice {
   comments: ICommentData[];
 }
 
+export interface IStudentSlice {
+  students: PaginateResult<IStudentData>;
+}
+
 export interface ICommentDocument extends ICommentData, Document {}
 
 export interface IUser {
@@ -66,7 +70,7 @@ export interface IPrice {
   name: string;
   type: "mensual" | "anual" | "personalizado";
   price: number;
-  class: number | string;
+  class: number | "ilimitado";
   description: string;
   characteristics: string[];
   active: boolean;

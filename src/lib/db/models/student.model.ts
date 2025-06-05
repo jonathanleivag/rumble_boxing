@@ -1,7 +1,8 @@
 "use server";
 
 import { IStudentDocument } from "@/type";
-import mongoose, { Schema, models } from "mongoose";
+import mongoose, { Schema, models, PaginateModel } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const StudentSchema = new Schema<IStudentDocument>(
   {
@@ -56,5 +57,11 @@ const StudentSchema = new Schema<IStudentDocument>(
   }
 );
 
+StudentSchema.plugin(mongoosePaginate);
+
 export const Student =
-  models.Student || mongoose.model<IStudentDocument>("Student", StudentSchema);
+  (models.Student as PaginateModel<IStudentDocument>) ||
+  mongoose.model<IStudentDocument, PaginateModel<IStudentDocument>>(
+    "Student",
+    StudentSchema
+  );

@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import CommentReducer from "./features/comment/comment.slice";
+import StudentReducer from "./features/student/student.slice";
 
 export const store = configureStore({
   reducer: {
     comment: CommentReducer,
+    student: StudentReducer,
   },
 });
 
