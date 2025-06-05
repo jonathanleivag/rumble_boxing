@@ -137,3 +137,18 @@ export type IStudentDTO = Omit<IStudent, "plan"> & {
 
 export interface IStudentData extends IData, IStudent {}
 export interface IStudentDocument extends IStudentData, Document {}
+
+export interface ModalEditUserComponentProps {
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  usuarioEditado: IStudentData | null;
+  showModal: boolean;
+  setUsuarioEditado: Dispatch<SetStateAction<IStudentData | null>>;
+  planes: IPriceData[];
+}
+
+export interface PaginationUserComponentProps {
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  currentPage: number;
+}

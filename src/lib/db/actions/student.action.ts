@@ -46,7 +46,7 @@ export const crearStudent = async (
 
 export const getAllStudents = async (
   page: number = 1,
-  limit: number = 5
+  limit: number = 7
 ): Promise<PaginateResult<IStudentData>> => {
   await connectToMongoDB();
 
