@@ -1,5 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
-import { Document, Types } from "mongoose";
+import { Document, Types, PaginateResult } from "mongoose";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -43,6 +43,10 @@ export interface ICommentSlice {
   comments: ICommentData[];
 }
 
+export interface IStudentSlice {
+  students: PaginateResult<IStudentData>;
+}
+
 export interface ICommentDocument extends ICommentData, Document {}
 
 export interface IUser {
@@ -66,14 +70,16 @@ export interface IPrice {
   name: string;
   type: "mensual" | "anual" | "personalizado";
   price: number;
-  class: number | string;
+  class: number | "ilimitado";
   description: string;
   characteristics: string[];
   active: boolean;
   isPopular: boolean;
 }
 
-export interface IPriceData extends IData, IPrice {}
+export interface IPriceData extends IData, IPrice {
+  id: string;
+}
 export interface IPriceDocument extends IPriceData, Document {}
 
 export interface PriceFormModalProps {
@@ -103,4 +109,46 @@ export interface PriceCardComponentProps {
   item: IPriceData;
   isPopular?: boolean;
   showConsultButton?: boolean;
+}
+
+export interface FormUserComponentProps {
+  showAddForm?: boolean;
+  setShowAddForm: Dispatch<SetStateAction<boolean>>;
+  planes: IPriceData[];
+}
+
+export type StatusStudent = "activo" | "inactivo" | "suspendido";
+
+export interface IStudent {
+  name: string;
+  email: string;
+  rut: string;
+  phone: string;
+  createDate: string;
+  plan: IPriceData;
+  assistance: number;
+  status: StatusStudent;
+  avatar?: string;
+}
+
+export type IStudentDTO = Omit<IStudent, "plan"> & {
+  plan: Types.ObjectId;
+};
+
+export interface IStudentData extends IData, IStudent {}
+export interface IStudentDocument extends IStudentData, Document {}
+
+export interface ModalEditUserComponentProps {
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  usuarioEditado: IStudentData | null;
+  showModal: boolean;
+  setUsuarioEditado: Dispatch<SetStateAction<IStudentData | null>>;
+  planes: IPriceData[];
+}
+
+export interface PaginationUserComponentProps {
+  isLoading: boolean;
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  currentPage: number;
 }

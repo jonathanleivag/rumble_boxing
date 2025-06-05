@@ -173,7 +173,7 @@ const DashboardPage: FC = () => {
             </p>
             <Link
               href="/dashboard/perfil"
-              className="bg-accent-dark hover:bg-[#2a2a2a] text-white py-2 px-4 rounded-full text-xs sm:text-sm font-oswald uppercase tracking-wider transition-all duration-300 w-full text-center"
+              className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white py-2 px-4 rounded-full text-xs sm:text-sm font-oswald uppercase tracking-wider transition-all duration-300 w-full text-center shadow-sm hover:shadow-md"
             >
               Ver detalles
             </Link>

@@ -20,7 +20,7 @@ const VideoShareModal: FC<VideoShareModalProps> = ({ setIsModalOpen }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50"
+        className="fixed inset-0 bg-black/40 backdrop-blur-md z-50"
         onClick={closeModal}
       />
 
