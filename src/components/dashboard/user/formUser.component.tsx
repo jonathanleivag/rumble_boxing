@@ -3,7 +3,7 @@
 import { crearStudent } from "@/lib/db/actions/student.action";
 import { FormUserComponentProps, IStudent } from "@/type";
 import { AnimatePresence, motion } from "framer-motion";
-import { FC, useState } from "react";
+import { FC, useState, useRef, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -25,6 +25,24 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  // Manejar clics fuera del selector de fecha para cerrarlo
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dateInputRef.current &&
+        !dateInputRef.current.contains(event.target as Node)
+      ) {
+        dateInputRef.current.blur();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleFileSelection = (file: File) => {
     setSelectedFile(file);
@@ -57,6 +75,38 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
 
   const watchPlan = watch("plan");
   const watchPlanId = watchPlan?.id;
+
+  // Prevenir propagación del evento desde el calendario
+  useEffect(() => {
+    const preventDatePickerPropagation = () => {
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      dateInputs.forEach((input) => {
+        // Prevenir que los clics en el calendario se propaguen
+        input.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+      });
+
+      // También manejar el calendario nativo que se abre
+      document.addEventListener(
+        "click",
+        (e) => {
+          if (
+            (e.target as HTMLElement)?.closest(
+              '.calendar-dropdown, input[type="date"]'
+            )
+          ) {
+            e.stopPropagation();
+          }
+        },
+        true
+      );
+    };
+
+    if (showAddForm) {
+      preventDatePickerPropagation();
+    }
+  }, [showAddForm]);
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
@@ -123,14 +173,18 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm overflow-hidden mb-6"
+          className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm overflow-hidden mb-6 w-full max-w-full"
         >
-          <div className="p-5">
-            <h2 className="font-oswald text-white text-lg mb-4">
-              Añadir Nuevo Usuario
+          <div className="p-5 md:p-6">
+            <h2 className="font-oswald text-white text-xl mb-5 flex items-center">
+              <span className="inline-block w-1.5 h-6 bg-gradient-to-b from-primary to-primary-dark rounded-sm mr-2"></span>
+              AÑADIR NUEVO USUARIO
             </h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-5 w-full"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label
                     htmlFor="name"
@@ -248,47 +302,80 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                   )}
                 </div>
 
-                <div>
+                <div className="flex flex-col gap-1">
                   <label
                     htmlFor="createDate"
                     className="block text-accent-medium font-montserrat text-xs mb-1"
                   >
                     Fecha de Ingreso
                   </label>
-                  <input
-                    id="createDate"
-                    type="date"
-                    className={`date-input w-full bg-accent-dark/40 rounded-lg border ${
-                      errors.createDate
-                        ? "border-red-500"
-                        : "border-accent-dark/40"
-                    } text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50`}
-                    {...register("createDate", {
-                      required: "La fecha de ingreso es obligatoria",
-                      validate: {
-                        notInFuture: (value) => {
-                          const selectedDate = new Date(value);
-                          const today = new Date();
-                          today.setHours(0, 0, 0, 0); // Reset the time to start of day for fair comparison
-                          return (
-                            selectedDate <= today ||
-                            "La fecha no puede ser futura"
-                          );
+                  <div className="relative isolate" ref={dateInputRef}>
+                    <input
+                      id="createDate"
+                      type="date"
+                      className={`w-full bg-accent-dark/40 rounded-lg border ${
+                        errors.createDate
+                          ? "border-red-500"
+                          : "border-accent-dark/40"
+                      } text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                      {...register("createDate", {
+                        required: "La fecha de ingreso es obligatoria",
+                        validate: {
+                          notInFuture: (value) => {
+                            const selectedDate = new Date(value);
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // Reset the time to start of day for fair comparison
+                            return (
+                              selectedDate <= today ||
+                              "La fecha no puede ser futura"
+                            );
+                          },
+                          notTooOld: (value) => {
+                            const selectedDate = new Date(value);
+                            const minDate = new Date("2000-01-01");
+                            return (
+                              selectedDate >= minDate ||
+                              "La fecha no puede ser anterior al año 2000"
+                            );
+                          },
                         },
-                        notTooOld: (value) => {
-                          const selectedDate = new Date(value);
-                          const minDate = new Date("2000-01-01");
-                          return (
-                            selectedDate >= minDate ||
-                            "La fecha no puede ser anterior al año 2000"
-                          );
-                        },
-                      },
-                    })}
-                    min="2000-01-01"
-                    max={new Date().toISOString().split("T")[0]}
-                    style={{ colorScheme: "dark" }}
-                  />
+                      })}
+                      min="2000-01-01"
+                      max={new Date().toISOString().split("T")[0]}
+                      style={{ colorScheme: "dark" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      onBlur={() => dateInputRef.current?.blur()}
+                    />
+                    {/* Icono de calendario */}
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                      <div className="bg-gradient-to-r from-primary to-primary-dark rounded-full p-1.5 shadow-md">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="w-3 h-3"
+                        >
+                          <rect
+                            x="3"
+                            y="4"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                          ></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
                   {errors.createDate && (
                     <p className="text-red-500 text-xs mt-1">
                       {errors.createDate.message}
@@ -397,20 +484,21 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                   >
                     Avatar
                   </label>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     {localPreviewUrl ? (
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden border border-accent-dark/40 group">
+                      <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-primary group mx-auto sm:mx-0">
                         <Image
                           src={localPreviewUrl}
                           alt="Avatar preview"
-                          width={64}
-                          height={64}
-                          className="object-cover"
+                          width={80}
+                          height={80}
+                          className="object-cover w-full h-full"
                         />
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary-dark rounded-full opacity-70 blur-sm group-hover:opacity-100 transition-opacity duration-300"></div>
                         <button
                           type="button"
                           onClick={cleanupPreview}
-                          className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
                           aria-label="Eliminar imagen"
                         >
                           <svg
@@ -419,7 +507,7 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             stroke="currentColor"
-                            className="w-6 h-6 text-white"
+                            className="w-6 h-6 text-white relative z-10"
                           >
                             <path
                               strokeLinecap="round"
@@ -430,17 +518,22 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <div className="w-16 h-16 rounded-full overflow-hidden border border-accent-dark/60">
+                      <div className="relative w-20 h-20 rounded-full overflow-hidden border border-accent-dark/60 mx-auto sm:mx-0 group">
                         <Image
                           src="https://res.cloudinary.com/dq8fpb695/image/upload/v1748900421/rumble/yfwwjdnhstzsmx2nuazq.webp"
                           alt="Avatar por defecto"
-                          width={64}
-                          height={64}
+                          width={80}
+                          height={80}
                           className="object-cover w-full h-full"
                         />
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <span className="text-white text-xs font-montserrat font-semibold">
+                            Seleccionar
+                          </span>
+                        </div>
                       </div>
                     )}
-                    <div className="flex-1">
+                    <div className="flex-1 w-full">
                       <input
                         id="avatar-upload"
                         type="file"
@@ -462,8 +555,8 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                         className={`${
                           isUploading
                             ? "bg-primary/50 cursor-not-allowed"
-                            : "bg-accent-dark/60 hover:bg-accent-dark cursor-pointer"
-                        } text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center`}
+                            : "bg-gradient-to-r from-accent-dark/80 to-accent-dark/60 hover:from-accent-dark/90 hover:to-accent-dark/70 cursor-pointer"
+                        } text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center shadow-sm hover:shadow-md w-full md:w-auto`}
                         disabled={isUploading}
                       >
                         {isUploading && (
@@ -497,7 +590,7 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                         <div className="w-full mt-2">
                           <div className="h-1 w-full bg-accent-dark/40 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-primary transition-all duration-300 rounded-full"
+                              className="h-full bg-gradient-to-r from-primary to-primary-dark transition-all duration-300 rounded-full"
                               style={{ width: `${uploadProgress}%` }}
                             ></div>
                           </div>
@@ -519,20 +612,20 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-2">
+              <div className="flex justify-end space-x-3 pt-4 mt-2 border-t border-accent-dark/30">
                 <button
                   type="button"
                   onClick={() => {
                     cleanupPreview();
                     setShowAddForm(false);
                   }}
-                  className="bg-accent-dark/60 hover:bg-accent-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                  className="bg-accent-dark/60 hover:bg-accent-dark text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
+                  className="bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white py-2.5 px-6 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg"
                 >
                   Guardar Usuario
                 </button>

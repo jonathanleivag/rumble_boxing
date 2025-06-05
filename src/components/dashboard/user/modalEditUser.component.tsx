@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { FC, useRef, useState } from "react";
+import { FC, useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { ModalEditUserComponentProps } from "@/type";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -20,10 +20,28 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
 }) => {
   const { uploadImage, isUploading } = useImageUpload();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dateInputRef.current &&
+        !dateInputRef.current.contains(event.target as Node)
+      ) {
+        // Cerrar el calendario si está abierto
+        dateInputRef.current.blur();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -358,10 +376,10 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                     Fecha de Creación
                   </label>
                   <div className="relative group">
-                    {/* Gradient background effect */}
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-primary-dark/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
 
                     <input
+                      ref={dateInputRef}
                       type="date"
                       value={
                         usuarioEditado.createDate &&
@@ -379,11 +397,14 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                           createDate: e.target.value,
                         })
                       }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      onBlur={() => dateInputRef.current?.blur()}
                       className="relative z-10 w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 group-hover:border-primary/50 transition-colors duration-300"
                       style={{ colorScheme: "dark" }}
                     />
 
-                    {/* Calendar icon with gradient */}
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                       <div className="bg-gradient-to-r from-primary to-primary-dark rounded-full p-1.5 shadow-md">
                         <svg
@@ -410,24 +431,6 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                         </svg>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Formatted date display */}
-                  {usuarioEditado.createDate &&
-                    !isNaN(new Date(usuarioEditado.createDate).getTime()) && (
-                      <div className="text-xs mt-2 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent font-medium">
-                        {new Date(usuarioEditado.createDate).toLocaleDateString(
-                          "es-ES",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )}
-                      </div>
-                    )}
-                  <div className="text-xs text-accent-medium mt-1 italic">
-                    Fecha entre 2000 y la actualidad
                   </div>
                 </div>
               </div>
