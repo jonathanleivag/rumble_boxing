@@ -152,3 +152,8 @@ export interface PaginationUserComponentProps {
   setCurrentPage: Dispatch<SetStateAction<number>>;
   currentPage: number;
 }
+
+export interface FilterUserComponentProps {
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  planes: IPriceData[];
+}

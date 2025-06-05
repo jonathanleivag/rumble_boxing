@@ -4,7 +4,7 @@ import { IPriceData, IStudentData, IStudentDTO } from "@/type";
 import { connectToMongoDB } from "../mongoose";
 import { Student } from "../models/student.model";
 import { getPriceById } from "./price.action";
-import { PaginateResult, Types } from "mongoose";
+import { PaginateResult } from "mongoose";
 
 export const crearStudent = async (
   data: IStudentDTO
@@ -35,11 +35,11 @@ export const crearStudent = async (
     rut: newStudent.rut,
     phone: newStudent.phone,
     createDate: newStudent.createDate,
-    plan: newStudent.plan.toString(),
+    plan: newStudent.plan,
     assistance: newStudent.assistance,
     status: newStudent.status,
     avatar: newStudent.avatar,
-    _id: newStudent._id.toString(),
+    _id: newStudent._id,
     createdAt: newStudent.createdAt?.toString?.() ?? null,
     updatedAt: newStudent.updatedAt?.toString?.() ?? null,
   };
