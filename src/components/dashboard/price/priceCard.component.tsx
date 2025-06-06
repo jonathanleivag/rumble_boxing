@@ -2,6 +2,7 @@ import { PriceCardProps } from "@/type";
 import { motion } from "framer-motion";
 import { FC } from "react";
 import { useMatriculaValue } from "@/hooks/useMatriculaValue";
+import { toChileanPesos } from "@/utils/toChileanPesos.util";
 
 const PriceCard: FC<PriceCardProps> = ({
   price,
@@ -54,7 +55,7 @@ const PriceCard: FC<PriceCardProps> = ({
             price.active ? "text-white" : "text-accent-medium"
           }`}
         >
-          ${price.price}{" "}
+          ${toChileanPesos(price.price)}{" "}
           <span className="text-accent-medium text-sm font-montserrat">
             {price.type}
           </span>
@@ -72,7 +73,9 @@ const PriceCard: FC<PriceCardProps> = ({
                 price.active ? "text-white" : "text-accent-medium"
               }`}
             >
-              <span className="text-2xl">${matriculaValue}</span>
+              <span className="text-2xl">
+                ${toChileanPesos(matriculaValue)}
+              </span>
               <span className="text-accent-medium text-xs ml-1">
                 pago único
               </span>

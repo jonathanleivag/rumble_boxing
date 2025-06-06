@@ -1,5 +1,6 @@
 import { PriceCardComponentProps } from "@/type";
 import { fadeInUp } from "@/utils/motionEffect.util";
+import { toChileanPesos } from "@/utils/toChileanPesos.util";
 import { motion } from "framer-motion";
 import { FC } from "react";
 
@@ -43,7 +44,7 @@ const PriceCard: FC<PriceCardComponentProps> = ({
           {!showConsultButton && (
             <>
               <span className="text-2xl mr-1 mt-2">$</span>
-              {item.price}
+              {toChileanPesos(item.price)}
               <span className="text-lg text-accent-medium self-end mb-2">
                 /{item.name}
               </span>
@@ -57,8 +58,8 @@ const PriceCard: FC<PriceCardComponentProps> = ({
         </p>
       </div>
       <ul className="font-montserrat text-accent-light space-y-4 mb-8 text-sm">
-        {item.characteristics.map((char: string) => (
-          <li key={char} className="flex items-start">
+        {item.characteristics.map((char: string, index) => (
+          <li key={`${char}_${index}`} className="flex items-start">
             <span className="text-primary mr-2 mt-0.5 flex-shrink-0">
               <svg
                 width="16"
