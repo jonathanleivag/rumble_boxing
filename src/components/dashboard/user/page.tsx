@@ -3,7 +3,7 @@
 import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import FormUserComponent from "./formUser.component";
-import { IPriceData, IStudentData } from "@/type";
+import { IPriceData, IStudentData, sortByType } from "@/type";
 import { getPrices } from "@/lib/db/actions/price.action";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getAllStudents } from "@/lib/db/actions/student.action";
@@ -20,6 +20,11 @@ const UserPageComponent: FC = () => {
   const [usuarioEditado, setUsuarioEditado] = useState<IStudentData | null>(
     null
   );
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filterPlan, setFilterPlan] = useState<string>("");
+  const [filterEstado, setFilterEstado] = useState<sortByType>("");
+  const [sortBy, setSortBy] = useState("createdAt");
+
   const [planes, setPlanes] = useState<IPriceData[]>([]);
   const students = useAppSelector((state) => state.student.students);
   const dispatch = useAppDispatch();
@@ -41,13 +46,34 @@ const UserPageComponent: FC = () => {
   useEffect(() => {
     const fetchStudents = async () => {
       setIsLoading(true);
-      const data = await getAllStudents(currentPage);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const filter: any = {};
+
+      if (searchTerm && searchTerm.trim() !== "") {
+        filter.search = searchTerm;
+      }
+
+      if (filterPlan && filterPlan.trim() !== "") {
+        filter.plan = filterPlan;
+      }
+
+      if (filterEstado && filterEstado.trim() !== "") {
+        filter.status = filterEstado;
+      }
+
+      if (sortBy && sortBy.trim() !== "") {
+        filter.sortBy = sortBy;
+        console.log("Sorting by:", sortBy);
+      }
+
+      const data = await getAllStudents(currentPage, 7, filter);
       dispatch(initialStudents(data));
       setIsLoading(false);
     };
     void fetchStudents();
     return () => {};
-  }, [dispatch, currentPage]);
+  }, [dispatch, currentPage, searchTerm, filterPlan, filterEstado, sortBy]);
 
   const openUserModal = (user: IStudentData) => {
     console.log("Opening user modal for:", user);
@@ -105,7 +131,18 @@ const UserPageComponent: FC = () => {
           planes={planes}
         />
       )}
-      <FilterUserComponent setCurrentPage={setCurrentPage} planes={planes} />
+      <FilterUserComponent
+        setCurrentPage={setCurrentPage}
+        planes={planes}
+        setSearchTerm={setSearchTerm}
+        searchTerm={searchTerm}
+        setFilterPlan={setFilterPlan}
+        filterPlan={filterPlan}
+        setFilterEstado={setFilterEstado}
+        filterEstado={filterEstado}
+        setSortBy={setSortBy}
+        sortBy={sortBy}
+      />
       <div className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm overflow-hidden">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">

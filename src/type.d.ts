@@ -153,7 +153,24 @@ export interface PaginationUserComponentProps {
   currentPage: number;
 }
 
+export type sortByType = "name" | "createDate" | "assistance" | "";
 export interface FilterUserComponentProps {
   setCurrentPage: Dispatch<SetStateAction<number>>;
   planes: IPriceData[];
+  setSearchTerm: Dispatch<SetStateAction<string>>;
+  searchTerm: string;
+  setFilterPlan: Dispatch<SetStateAction<string>>;
+  filterPlan: string;
+  setFilterEstado: Dispatch<SetStateAction<sortByType>>;
+  filterEstado: sortByType;
+  setSortBy: Dispatch<SetStateAction<string>>;
+  sortBy: string;
+}
+
+export interface StudentQuery {
+  search?: string;
+  plan?: string;
+  status?: string;
+  sortBy?: sortByType;
+  sortOrder?: "asc" | "desc";
 }

@@ -1,16 +1,39 @@
-'use client";';
+"use client";
 
 import { FilterUserComponentProps } from "@/type";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState, useCallback } from "react";
 
 const FilterUserComponent: FC<FilterUserComponentProps> = ({
   setCurrentPage,
   planes,
+  searchTerm,
+  setSearchTerm,
+  setFilterPlan,
+  filterPlan,
+  setFilterEstado,
+  filterEstado,
+  setSortBy,
+  sortBy,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterPlan, setFilterPlan] = useState("");
-  const [filterEstado, setFilterEstado] = useState("");
-  const [sortBy, setSortBy] = useState("nombre");
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+  const debouncedSearch = useCallback(
+    (value: string) => {
+      const timer = setTimeout(() => {
+        setSearchTerm(value);
+      }, 500);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    },
+    [setSearchTerm]
+  );
+
+  useEffect(() => {
+    const cleanup = debouncedSearch(localSearchTerm);
+    return cleanup;
+  }, [localSearchTerm, debouncedSearch]);
 
   useEffect(() => {
     if (searchTerm || filterPlan || filterEstado) {
@@ -32,8 +55,8 @@ const FilterUserComponent: FC<FilterUserComponentProps> = ({
             id="search"
             type="text"
             placeholder="Nombre, email o RUT"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={localSearchTerm}
+            onChange={(e) => setLocalSearchTerm(e.target.value)}
             className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
@@ -90,12 +113,13 @@ const FilterUserComponent: FC<FilterUserComponentProps> = ({
           <select
             id="sortBy"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
             className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
           >
-            <option value="nombre">Nombre</option>
-            <option value="fechaRegistro">Fecha de registro</option>
-            <option value="asistencias">Asistencias</option>
+            <option value="createdAt">fecha de creación</option>
+            <option value="name">Nombre</option>
+            <option value="createDate">Fecha de ingreso</option>
+            <option value="assistance">Asistencias</option>
           </select>
         </div>
       </div>
