@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { FC, useEffect, useState, useMemo } from "react";
 import PriceCard from "./priceCard.component";
 import { useMatriculaValue } from "@/hooks/useMatriculaValue";
+import { toChileanPesos } from "@/utils/toChileanPesos.util";
 
 const PricingComponent: FC = () => {
   const [prices, setPrices] = useState<IPriceData[]>([]);
@@ -106,7 +107,7 @@ const PricingComponent: FC = () => {
                     $
                   </span>
                   <span className="text-primary font-bebas text-4xl">
-                    {matriculaValue}
+                    {toChileanPesos(matriculaValue)}
                   </span>
                   <span className="text-accent-medium text-xs self-end mb-1 ml-1">
                     (pago único)
