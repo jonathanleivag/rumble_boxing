@@ -11,7 +11,15 @@ export async function getMatricula(): Promise<IMatriculaData | null> {
       .sort({ createdAt: -1 })
       .lean();
 
-    return matricula as unknown as IMatriculaData;
+    if (!matricula || Array.isArray(matricula)) return null;
+
+    return {
+      _id: matricula._id?.toString?.() ?? "",
+      value: matricula.value,
+      description: matricula.description,
+      createdAt: matricula.createdAt?.toString?.() ?? null,
+      updatedAt: matricula.updatedAt?.toString?.() ?? null,
+    } as unknown as IMatriculaData;
   } catch (error) {
     console.error("Error en getMatricula:", error);
     throw new Error("Error al obtener el valor de la matrícula");

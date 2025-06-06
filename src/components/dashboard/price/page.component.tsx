@@ -340,16 +340,17 @@ const PricePageComponent: FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPrecios.map((price) => (
-                <PriceCard
-                  key={price._id.toString()}
-                  price={price}
-                  onEdit={() => openEditModal(price)}
-                  onDelete={() => showDeleteConfirm(price)}
-                  onToggleActive={() => showToggleActiveConfirm(price)}
-                  onTogglePopular={() => showTogglePopularConfirm(price)}
-                />
-              ))}
+              {filteredPrecios &&
+                filteredPrecios.map((price) => (
+                  <PriceCard
+                    key={price._id.toString()}
+                    price={price}
+                    onEdit={() => openEditModal(price)}
+                    onDelete={() => showDeleteConfirm(price)}
+                    onToggleActive={() => showToggleActiveConfirm(price)}
+                    onTogglePopular={() => showTogglePopularConfirm(price)}
+                  />
+                ))}
             </div>
           )}
 
