@@ -1,10 +1,10 @@
 "use server";
 
-import { IPriceData, IStudentData, IStudentDTO } from "@/type";
+import { IPriceData, IStudentData, IStudentDTO, StudentQuery } from "@/type";
 import { connectToMongoDB } from "../mongoose";
 import { Student } from "../models/student.model";
 import { getPriceById } from "./price.action";
-import { PaginateResult, Types } from "mongoose";
+import { PaginateResult } from "mongoose";
 
 export const crearStudent = async (
   data: IStudentDTO
@@ -35,11 +35,11 @@ export const crearStudent = async (
     rut: newStudent.rut,
     phone: newStudent.phone,
     createDate: newStudent.createDate,
-    plan: newStudent.plan.toString(),
+    plan: newStudent.plan,
     assistance: newStudent.assistance,
     status: newStudent.status,
     avatar: newStudent.avatar,
-    _id: newStudent._id.toString(),
+    _id: newStudent._id,
     createdAt: newStudent.createdAt?.toString?.() ?? null,
     updatedAt: newStudent.updatedAt?.toString?.() ?? null,
   };
@@ -47,14 +47,42 @@ export const crearStudent = async (
 
 export const getAllStudents = async (
   page: number = 1,
-  limit: number = 7
+  limit: number = 7,
+  query: StudentQuery = {}
 ): Promise<PaginateResult<IStudentData>> => {
   await connectToMongoDB();
 
-  const students = await Student.paginate(
-    {},
-    { page, limit, populate: "plan" }
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filter: any = {};
+
+  if (query.search) {
+    const regex = {
+      $or: [
+        { name: new RegExp(query.search, "i") },
+        { email: new RegExp(query.search, "i") },
+        { rut: new RegExp(query.search, "i") },
+      ],
+    };
+    filter.$or = regex.$or;
+  }
+
+  if (query.plan) {
+    filter.plan = query.plan;
+  }
+
+  if (query.status) {
+    filter.status = query.status;
+  }
+
+  const sortField = query.sortBy ?? "createDate";
+  const sortOrder = query.sortOrder === "asc" ? 1 : -1;
+
+  const students = await Student.paginate(filter, {
+    page,
+    limit,
+    populate: "plan",
+    sort: { [sortField]: sortOrder },
+  });
 
   const serializedDocs = students.docs.map((student) => ({
     _id: student._id.toString(),

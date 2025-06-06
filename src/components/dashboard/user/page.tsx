@@ -3,19 +3,16 @@
 import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import FormUserComponent from "./formUser.component";
-import { IPriceData, IStudentData } from "@/type";
+import { IPriceData, IStudentData, sortByType } from "@/type";
 import { getPrices } from "@/lib/db/actions/price.action";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getAllStudents } from "@/lib/db/actions/student.action";
 import { initialStudents } from "@/lib/redux/features/student/student.slice";
 import ModalEditUserComponent from "./modalEditUser.component";
 import PaginationUserComponent from "./paginationUser.component";
+import FilterUserComponent from "./filterUser.component";
 
 const UserPageComponent: FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterPlan, setFilterPlan] = useState("");
-  const [filterEstado, setFilterEstado] = useState("");
-  const [sortBy, setSortBy] = useState("nombre");
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -23,6 +20,11 @@ const UserPageComponent: FC = () => {
   const [usuarioEditado, setUsuarioEditado] = useState<IStudentData | null>(
     null
   );
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filterPlan, setFilterPlan] = useState<string>("");
+  const [filterEstado, setFilterEstado] = useState<sortByType>("");
+  const [sortBy, setSortBy] = useState("createdAt");
+
   const [planes, setPlanes] = useState<IPriceData[]>([]);
   const students = useAppSelector((state) => state.student.students);
   const dispatch = useAppDispatch();
@@ -42,21 +44,36 @@ const UserPageComponent: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (searchTerm || filterPlan || filterEstado) {
-      setCurrentPage(1);
-    }
-  }, [searchTerm, filterPlan, filterEstado]);
-
-  useEffect(() => {
     const fetchStudents = async () => {
       setIsLoading(true);
-      const data = await getAllStudents(currentPage);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const filter: any = {};
+
+      if (searchTerm && searchTerm.trim() !== "") {
+        filter.search = searchTerm;
+      }
+
+      if (filterPlan && filterPlan.trim() !== "") {
+        filter.plan = filterPlan;
+      }
+
+      if (filterEstado && filterEstado.trim() !== "") {
+        filter.status = filterEstado;
+      }
+
+      if (sortBy && sortBy.trim() !== "") {
+        filter.sortBy = sortBy;
+        console.log("Sorting by:", sortBy);
+      }
+
+      const data = await getAllStudents(currentPage, 7, filter);
       dispatch(initialStudents(data));
       setIsLoading(false);
     };
     void fetchStudents();
     return () => {};
-  }, [dispatch, currentPage]);
+  }, [dispatch, currentPage, searchTerm, filterPlan, filterEstado, sortBy]);
 
   const openUserModal = (user: IStudentData) => {
     console.log("Opening user modal for:", user);
@@ -114,91 +131,18 @@ const UserPageComponent: FC = () => {
           planes={planes}
         />
       )}
-
-      {/* Filtros y búsqueda */}
-      <div className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm p-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label
-              htmlFor="search"
-              className="block text-accent-medium font-montserrat text-xs mb-1"
-            >
-              Buscar
-            </label>
-            <input
-              id="search"
-              type="text"
-              placeholder="Nombre, email o RUT"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="filterPlan"
-              className="block text-accent-medium font-montserrat text-xs mb-1"
-            >
-              Plan
-            </label>
-            <select
-              id="filterPlan"
-              value={filterPlan}
-              onChange={(e) => setFilterPlan(e.target.value)}
-              className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              <option value="">Todos los planes</option>
-              {planes.map((plan) => (
-                <option key={plan.id} value={plan.id}>
-                  {plan.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="filterEstado"
-              className="block text-accent-medium font-montserrat text-xs mb-1"
-            >
-              Estado
-            </label>
-            <select
-              id="filterEstado"
-              value={filterEstado}
-              onChange={(e) => setFilterEstado(e.target.value)}
-              className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              <option value="">Todos</option>
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-              <option value="suspendido">Suspendido</option>
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="sortBy"
-              className="block text-accent-medium font-montserrat text-xs mb-1"
-            >
-              Ordenar por
-            </label>
-            <select
-              id="sortBy"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              <option value="nombre">Nombre</option>
-              <option value="fechaRegistro">Fecha de registro</option>
-              <option value="asistencias">Asistencias</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabla de usuarios */}
+      <FilterUserComponent
+        setCurrentPage={setCurrentPage}
+        planes={planes}
+        setSearchTerm={setSearchTerm}
+        searchTerm={searchTerm}
+        setFilterPlan={setFilterPlan}
+        filterPlan={filterPlan}
+        setFilterEstado={setFilterEstado}
+        filterEstado={filterEstado}
+        setSortBy={setSortBy}
+        sortBy={sortBy}
+      />
       <div className="bg-gradient-to-br from-accent-dark/80 to-[#1a1a1a] rounded-xl border border-accent-dark/30 shadow-xl backdrop-blur-sm overflow-hidden">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
@@ -232,10 +176,7 @@ const UserPageComponent: FC = () => {
                       <div className="flex items-center">
                         <div className="w-8 h-8 rounded-full overflow-hidden mr-3">
                           <Image
-                            src={
-                              user.avatar ||
-                              "https://res.cloudinary.com/dq8fpb695/image/upload/v1748900421/rumble/yfwwjdnhstzsmx2nuazq.webp"
-                            }
+                            src={user.avatar as string}
                             alt={user.name}
                             width={32}
                             height={32}
