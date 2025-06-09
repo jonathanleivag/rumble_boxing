@@ -7,6 +7,8 @@ import { FC, useState, useRef, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Image from "next/image";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { addStudent } from "@/lib/redux/features/student/student.slice";
 
 const FormUserComponent: FC<FormUserComponentProps> = ({
   showAddForm,
@@ -26,8 +28,8 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const dispatch = useAppDispatch();
 
-  // Manejar clics fuera del selector de fecha para cerrarlo
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -76,7 +78,6 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
   const watchPlan = watch("plan");
   const watchPlanId = watchPlan?.id;
 
-  // Prevenir propagación del evento desde el calendario
   useEffect(() => {
     const preventDatePickerPropagation = () => {
       const dateInputs = document.querySelectorAll('input[type="date"]');
@@ -110,8 +111,6 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     try {
-      console.log("Procesando formulario...");
-
       const selectedDate = new Date(data.createDate);
       const today = new Date();
       const minDate = new Date("2000-01-01");
@@ -145,7 +144,12 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
         avatar: avatarUrl,
       });
 
-      console.log("Usuario creado:", dataCreateUser);
+      dispatch(
+        addStudent({
+          ...dataCreateUser,
+          plan: planes.find((p) => p._id === data.plan._id) || data.plan,
+        })
+      );
 
       reset();
       resetImageUpload();
