@@ -293,9 +293,22 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                     placeholder="12.345.678-9"
                     {...register("rut", {
                       required: "El RUT es obligatorio",
-                      pattern: {
-                        value: /^(\d{1,3}(?:\.\d{3}){2}-[\dkK])$/i,
-                        message: "Formato de RUT inválido (ej: 12.345.678-9)",
+                      validate: {
+                        formatoValido: (value) =>
+                          /^(\d{1,3}(?:\.\d{3}){2}-[\dkK])$/i.test(value) ||
+                          "Formato de RUT inválido (ej: 12.345.678-9)",
+                      },
+                      onChange: (e) => {
+                        const rawRut = e.target.value
+                          .replace(/[^\dkK]/g, "")
+                          .toUpperCase();
+                        const formattedRut = rawRut
+                          .replace(
+                            /^(\d{1,2})(\d{3})(\d{3})([kK\d]{0,1})$/,
+                            "$1.$2.$3-$4"
+                          )
+                          .replace(/[-.]$/, "");
+                        e.target.value = formattedRut;
                       },
                     })}
                   />

@@ -137,6 +137,7 @@ export interface IStudent {
   createDate: string;
   plan: IPriceData;
   assistance: number;
+  updateAssistance: Date;
   status: StatusStudent;
   avatar?: string;
 }

@@ -294,12 +294,21 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                   <input
                     type="text"
                     value={usuarioEditado.rut}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const rawRut = e.target.value
+                        .replace(/[^\dkK]/g, "")
+                        .toUpperCase();
+                      const rut = rawRut
+                        .replace(
+                          /^(\d{1,2})(\d{3})(\d{3})([kK\d]{0,1})$/,
+                          "$1.$2.$3-$4"
+                        )
+                        .replace(/[-.]$/, "");
                       setUsuarioEditado({
                         ...usuarioEditado,
-                        rut: e.target.value,
-                      })
-                    }
+                        rut,
+                      });
+                    }}
                     className="w-full bg-accent-dark/40 rounded-lg border border-accent-dark/40 text-white p-2 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                 </div>
