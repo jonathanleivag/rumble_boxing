@@ -15,6 +15,7 @@ const CommentModal: FC<CommentModalProps> = ({
   quote,
   rating: valueRating,
   edit,
+  status,
 }) => {
   const [rating, setRating] = useState<number>(valueRating);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
@@ -35,12 +36,14 @@ const CommentModal: FC<CommentModalProps> = ({
           textRating: textRating(rating),
           email: session?.user?.email || "",
           rating,
+          status: "pending",
         });
       } else {
         data = await editComment(session?.user?.email || "", {
           quote: comment,
           textRating: textRating(rating),
           rating,
+          status: "pending",
         });
       }
 
@@ -57,6 +60,32 @@ const CommentModal: FC<CommentModalProps> = ({
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose();
+  };
+
+  const getColorStatus = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "text-yellow-500";
+      case "approved":
+        return "text-green-500";
+      case "rejected":
+        return "text-red-500";
+      default:
+        return "text-accent-medium";
+    }
+  };
+
+  const getTextStatus = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Pendiente de revisión";
+      case "approved":
+        return "Aprobado";
+      case "rejected":
+        return "Rechazado";
+      default:
+        return "Estado desconocido";
+    }
   };
 
   if (!isOpen) return null;
@@ -129,6 +158,15 @@ const CommentModal: FC<CommentModalProps> = ({
                   <p className="text-accent-medium text-xs">
                     {session.user?.email}
                   </p>
+                  {edit && (
+                    <p
+                      className={`text-accent-medium text-xs my-3 ${getColorStatus(
+                        status
+                      )}`}
+                    >
+                      {getTextStatus(status)}
+                    </p>
+                  )}
                 </div>
               </div>
             )}

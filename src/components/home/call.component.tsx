@@ -17,7 +17,7 @@ import {
   editComment,
   initialComment,
 } from "@/lib/redux/features/comment/comment.slice";
-import { ICommentData } from "@/type";
+import { ICommentData, StatusComment } from "@/type";
 import { textRating } from "@/utils/rating.util";
 
 const CallComponent: FC = () => {
@@ -28,6 +28,7 @@ const CallComponent: FC = () => {
   const [showNotification, setShowNotification] = useState<boolean>(false);
   const [quote, setQuote] = useState<string>("");
   const [rating, setRating] = useState<number>(5);
+  const [status, setStatus] = useState<StatusComment | "">("");
   const [edit, setEdit] = useState<boolean>(false);
   const { data: session } = useSession();
   const comments = useAppSelector((state) => state.comment.comments);
@@ -36,7 +37,7 @@ const CallComponent: FC = () => {
   useEffect(() => {
     const dataFetch = async () => {
       try {
-        const commentsData = await getComments();
+        const commentsData = await getComments("approved");
         dispatch(initialComment(commentsData));
       } catch (error) {
         console.error("Error fetching comments:", error);
@@ -57,9 +58,11 @@ const CallComponent: FC = () => {
       if (data) {
         setQuote(data.quote);
         setRating(data.rating);
+        setStatus(data.status as StatusComment);
         setEdit(true);
       } else {
         setQuote("");
+        setStatus("");
         setRating(5);
         setEdit(false);
       }
@@ -217,6 +220,7 @@ const CallComponent: FC = () => {
               quote={quote}
               rating={rating}
               edit={edit}
+              status="pending"
             />
           )}
         </AnimatePresence>
@@ -331,7 +335,7 @@ const CallComponent: FC = () => {
               </button>
 
               <div className="flex justify-center gap-2 items-center">
-                {comments.map((_, index) => (
+                {comments.docs.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => goToTestimonial(index)}

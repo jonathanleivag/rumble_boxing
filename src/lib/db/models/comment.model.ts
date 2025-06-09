@@ -1,6 +1,7 @@
 "use server";
 import { ICommentDocument } from "@/type";
-import mongoose, { Model } from "mongoose";
+import mongoose, { models, PaginateModel } from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 const commentSchema = new mongoose.Schema<ICommentDocument>(
   {
@@ -32,6 +33,12 @@ const commentSchema = new mongoose.Schema<ICommentDocument>(
       min: 1,
       max: 5,
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      required: true,
+      default: "pending",
+    },
   },
   {
     timestamps: true,
@@ -39,7 +46,10 @@ const commentSchema = new mongoose.Schema<ICommentDocument>(
   }
 );
 
-const Comment: Model<ICommentDocument> =
-  mongoose.models.Comment || mongoose.model("Comment", commentSchema);
+commentSchema.plugin(mongoosePaginate);
+
+const Comment =
+  (models.Comment as PaginateModel<ICommentDocument>) ||
+  mongoose.model<ICommentDocument>("Comment", commentSchema);
 
 export default Comment;
