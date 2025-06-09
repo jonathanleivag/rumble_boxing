@@ -1,8 +1,15 @@
 "use server";
 
-import { ICommentData, ICommentDocument, TestimonialComment } from "@/type";
+import {
+  CountStatusComments,
+  ICommentData,
+  ICommentDocument,
+  StatusComment,
+  TestimonialComment,
+} from "@/type";
 import { connectToMongoDB } from "../mongoose";
 import Comment from "@/lib/db/models/comment.model";
+import { PaginateResult } from "mongoose";
 
 export const addComment = async (
   data: TestimonialComment
@@ -21,6 +28,7 @@ export const addComment = async (
       image: testimonial.image || "",
       rating: testimonial.rating,
       textRating: testimonial.textRating || "",
+      status: testimonial.status,
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -30,32 +38,65 @@ export const addComment = async (
   }
 };
 
-export const getComments = async () => {
+export const getComments = async (
+  status?: StatusComment,
+  page: number = 1,
+  limit: number = 5
+): Promise<PaginateResult<ICommentData>> => {
   await connectToMongoDB();
   try {
-    const commentsData: ICommentDocument[] = await Comment.find();
+    let commentsData: PaginateResult<ICommentDocument>;
 
-    const comments: ICommentData[] = commentsData.map(
-      (comment: ICommentDocument) => ({
-        _id: comment.id.toString(),
-        name: comment.name,
-        email: comment.email,
-        quote: comment.quote,
-        createdAt: new Date(comment.createdAt).toISOString(),
-        updatedAt: new Date(comment.updatedAt).toISOString(),
-        image: comment.image || "",
-        rating: comment.rating,
-        textRating: comment.textRating || "",
-      })
-    );
+    if (status) {
+      commentsData = await Comment.paginate({ status }, { limit, page });
+    } else {
+      commentsData = await Comment.paginate({}, { limit, page });
+    }
 
-    return comments;
+    const serializedDocs: ICommentData[] = commentsData.docs.map((comment) => ({
+      _id: comment._id.toString(),
+      name: comment.name,
+      email: comment.email,
+      quote: comment.quote,
+      createdAt: comment.createdAt?.toString?.() ?? "",
+      updatedAt: comment.updatedAt?.toString?.() ?? "",
+      image: comment.image || "",
+      rating: comment.rating,
+      textRating: comment.textRating || "",
+      status: comment.status,
+    })) as unknown as ICommentData[];
+
+    return {
+      docs: serializedDocs,
+      totalDocs: commentsData.totalDocs,
+      limit: commentsData.limit,
+      hasPrevPage: commentsData.hasPrevPage,
+      hasNextPage: commentsData.hasNextPage,
+      page: commentsData.page,
+      totalPages: commentsData.totalPages,
+      offset: commentsData.offset,
+      prevPage: commentsData.prevPage ?? null,
+      nextPage: commentsData.nextPage ?? null,
+      pagingCounter: commentsData.pagingCounter,
+    };
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error al obtener los comentarios:", error.message);
       throw new Error("Error al obtener los comentarios");
     }
-    return [];
+    return {
+      docs: [],
+      totalDocs: 0,
+      limit: 0,
+      hasPrevPage: false,
+      hasNextPage: false,
+      page: 1,
+      totalPages: 0,
+      offset: 0,
+      prevPage: null,
+      nextPage: null,
+      pagingCounter: 0,
+    };
   }
 };
 
@@ -79,6 +120,7 @@ export const oneComment = async (
       image: comment.image || "",
       rating: comment.rating,
       textRating: comment.textRating || "",
+      status: comment.status,
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -121,5 +163,65 @@ export const editComment = async (
       console.error("Error al editar el comentario:", error.message);
     }
     throw new Error("Error al editar el comentario");
+  }
+};
+
+export const countStatusComments = async (): Promise<CountStatusComments> => {
+  await connectToMongoDB();
+  try {
+    const approvedCount = await Comment.countDocuments({ status: "approved" });
+    const pendingCount = await Comment.countDocuments({ status: "pending" });
+    const rejectedCount = await Comment.countDocuments({ status: "rejected" });
+
+    return {
+      approved: approvedCount,
+      pending: pendingCount,
+      rejected: rejectedCount,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error al contar los comentarios:", error.message);
+      throw new Error("Error al contar los comentarios");
+    }
+    return { approved: 0, pending: 0, rejected: 0 };
+  }
+};
+
+export const updateCommentStatus = async (
+  id: string,
+  status: StatusComment
+): Promise<ICommentData> => {
+  await connectToMongoDB();
+  try {
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!comment) {
+      throw new Error("Comentario no encontrado");
+    }
+
+    return {
+      _id: comment.id.toString(),
+      name: comment.name,
+      email: comment.email,
+      quote: comment.quote,
+      createdAt: new Date(comment.createdAt).toISOString(),
+      updatedAt: new Date(comment.updatedAt).toISOString(),
+      image: comment.image || "",
+      rating: comment.rating,
+      textRating: comment.textRating || "",
+      status: comment.status,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(
+        "Error al actualizar el estado del comentario:",
+        error.message
+      );
+    }
+    throw new Error("Error al actualizar el estado del comentario");
   }
 };

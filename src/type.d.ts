@@ -1,5 +1,6 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
 import { Document, Types, PaginateResult } from "mongoose";
+import { countStatusComments } from "./lib/db/actions/comment.action";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -22,6 +23,7 @@ export interface CommentModalProps {
   quote: string;
   rating: number;
   edit: boolean;
+  status: StatusComment | "";
 }
 
 export interface IData {
@@ -29,18 +31,26 @@ export interface IData {
   createdAt: string;
   updatedAt: string;
 }
+
+export type StatusComment = "pending" | "approved" | "rejected";
+
 export interface IComment {
   name: string;
   quote: string;
   image?: string;
   textRating: string;
+  status?: StatusComment;
   email: string;
   rating: number;
 }
 
 export interface ICommentData extends IData, IComment {}
 export interface ICommentSlice {
-  comments: ICommentData[];
+  comments: PaginateResult<ICommentData>;
+  countStatusComments: CountStatusComments;
+  page: number;
+  limit: number;
+  status: StatusComment;
 }
 
 export interface IStudentSlice {
@@ -173,4 +183,10 @@ export interface StudentQuery {
   status?: string;
   sortBy?: sortByType;
   sortOrder?: "asc" | "desc";
+}
+
+export interface CountStatusComments {
+  approved: number;
+  pending: number;
+  rejected: number;
 }
