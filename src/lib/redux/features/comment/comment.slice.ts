@@ -25,7 +25,7 @@ const initialState: ICommentSlice = {
     rejected: 0,
   },
   page: 1,
-  limit: 1,
+  limit: 5,
   status: "pending",
 };
 
