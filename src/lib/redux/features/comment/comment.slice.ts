@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CountStatusComments, ICommentData, ICommentSlice } from "@/type";
+import {
+  CountStatusComments,
+  ICommentData,
+  ICommentSlice,
+  StatusComment,
+} from "@/type";
 import type { WritableDraft } from "immer";
 import { PaginateResult } from "mongoose";
 
@@ -21,6 +26,7 @@ const initialState: ICommentSlice = {
   },
   page: 1,
   limit: 1,
+  status: "pending",
 };
 
 export const commentSlice = createSlice({
@@ -82,6 +88,9 @@ export const commentSlice = createSlice({
     setLimitComment: (state, action: PayloadAction<number>) => {
       state.limit = action.payload;
     },
+    setStatusComment: (state, action: PayloadAction<StatusComment>) => {
+      state.status = action.payload;
+    },
   },
 });
 
@@ -93,6 +102,7 @@ export const {
   initialCountStatusComments,
   setPageComment,
   setLimitComment,
+  setStatusComment,
 } = commentSlice.actions;
 
 export default commentSlice.reducer;

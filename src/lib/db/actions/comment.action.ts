@@ -120,6 +120,7 @@ export const oneComment = async (
       image: comment.image || "",
       rating: comment.rating,
       textRating: comment.textRating || "",
+      status: comment.status,
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -183,5 +184,44 @@ export const countStatusComments = async (): Promise<CountStatusComments> => {
       throw new Error("Error al contar los comentarios");
     }
     return { approved: 0, pending: 0, rejected: 0 };
+  }
+};
+
+export const updateCommentStatus = async (
+  id: string,
+  status: StatusComment
+): Promise<ICommentData> => {
+  await connectToMongoDB();
+  try {
+    const comment = await Comment.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!comment) {
+      throw new Error("Comentario no encontrado");
+    }
+
+    return {
+      _id: comment.id.toString(),
+      name: comment.name,
+      email: comment.email,
+      quote: comment.quote,
+      createdAt: new Date(comment.createdAt).toISOString(),
+      updatedAt: new Date(comment.updatedAt).toISOString(),
+      image: comment.image || "",
+      rating: comment.rating,
+      textRating: comment.textRating || "",
+      status: comment.status,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(
+        "Error al actualizar el estado del comentario:",
+        error.message
+      );
+    }
+    throw new Error("Error al actualizar el estado del comentario");
   }
 };

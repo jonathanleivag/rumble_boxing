@@ -80,7 +80,7 @@ const CallComponent: FC = () => {
     if (session?.user) {
       if (!edit) {
         dispatch(addComment(commentData));
-        setCurrentTestimonial(comments.length);
+        setCurrentTestimonial(comments.docs.length);
       } else {
         dispatch(editComment(commentData));
       }
@@ -94,12 +94,12 @@ const CallComponent: FC = () => {
   };
 
   const nextTestimonial = useCallback(() => {
-    setCurrentTestimonial((prev) => (prev + 1) % comments.length);
-  }, [comments.length]);
+    setCurrentTestimonial((prev) => (prev + 1) % comments.docs.length);
+  }, [comments.docs.length]);
 
   const prevTestimonial = () => {
     setCurrentTestimonial(
-      (prev) => (prev - 1 + comments.length) % comments.length
+      (prev) => (prev - 1 + comments.docs.length) % comments.docs.length
     );
   };
 
@@ -220,7 +220,7 @@ const CallComponent: FC = () => {
               quote={quote}
               rating={rating}
               edit={edit}
-              status="pending"
+              status={status}
             />
           )}
         </AnimatePresence>
@@ -232,9 +232,9 @@ const CallComponent: FC = () => {
           className="mt-20 max-w-4xl mx-auto bg-gradient-to-r from-accent-dark/80 to-[#0f0f0f]/80 p-8 rounded-2xl backdrop-blur-sm border border-accent-dark/30"
         >
           <AnimatePresence mode="wait">
-            {comments.length > 0 && comments[currentTestimonial] && (
+            {comments.docs.length > 0 && comments.docs[currentTestimonial] && (
               <motion.div
-                key={comments[currentTestimonial]._id?.toString()}
+                key={comments.docs[currentTestimonial]._id?.toString()}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -242,10 +242,10 @@ const CallComponent: FC = () => {
                 className="flex items-start gap-4"
               >
                 <div className="w-16 h-16 rounded-full bg-accent-medium flex-shrink-0 overflow-hidden">
-                  {comments[currentTestimonial]?.image ? (
+                  {comments.docs[currentTestimonial]?.image ? (
                     <Image
-                      src={comments[currentTestimonial].image}
-                      alt={comments[currentTestimonial].name}
+                      src={comments.docs[currentTestimonial].image}
+                      alt={comments.docs[currentTestimonial].name}
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
@@ -253,7 +253,7 @@ const CallComponent: FC = () => {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-primary/20">
                       <span className="font-bebas text-white text-xl">
-                        {comments[currentTestimonial].name.charAt(0)}
+                        {comments.docs[currentTestimonial].name.charAt(0)}
                       </span>
                     </div>
                   )}
@@ -261,7 +261,7 @@ const CallComponent: FC = () => {
                 <div>
                   <div className="flex mb-2">
                     {[...Array(5)].map((_, i) =>
-                      i < comments[currentTestimonial].rating ? (
+                      i < comments.docs[currentTestimonial].rating ? (
                         <svg
                           key={i}
                           className="w-4 h-4 text-primary"
@@ -288,20 +288,20 @@ const CallComponent: FC = () => {
                   </div>
                   <div className="text-primary mb-5">
                     <p className="text-xs">
-                      {textRating(comments[currentTestimonial].rating)}{" "}
+                      {textRating(comments.docs[currentTestimonial].rating)}{" "}
                     </p>
                   </div>
                   <p className="font-montserrat text-accent-light italic mb-2 text-sm">
-                    &ldquo;{comments[currentTestimonial].quote}&rdquo;
+                    &ldquo;{comments.docs[currentTestimonial].quote}&rdquo;
                   </p>
                   <div>
                     <p className="font-oswald text-white">
-                      {comments[currentTestimonial].name}
+                      {comments.docs[currentTestimonial].name}
                     </p>
                     <p className="font-montserrat text-accent-medium text-xs">
-                      {comments[currentTestimonial].createdAt
+                      {comments.docs[currentTestimonial].createdAt
                         ? new Date(
-                            comments[currentTestimonial].createdAt
+                            comments.docs[currentTestimonial].createdAt
                           ).toLocaleDateString()
                         : ""}
                     </p>
@@ -310,7 +310,7 @@ const CallComponent: FC = () => {
               </motion.div>
             )}
           </AnimatePresence>
-          {comments.length !== 0 && (
+          {comments.docs.length !== 0 && (
             <div className="flex justify-between items-center mt-6">
               <button
                 onClick={prevTestimonial}

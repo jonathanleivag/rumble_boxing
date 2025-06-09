@@ -7,8 +7,15 @@ import { format } from "date-fns";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 
 import { StatusComment } from "@/type";
-import { getComments } from "@/lib/db/actions/comment.action";
-import { initialComment } from "@/lib/redux/features/comment/comment.slice";
+import {
+  countStatusComments,
+  getComments,
+  updateCommentStatus,
+} from "@/lib/db/actions/comment.action";
+import {
+  initialComment,
+  initialCountStatusComments,
+} from "@/lib/redux/features/comment/comment.slice";
 import StatusCommentComponent from "./statusComment.component";
 import PaginationCommentComponent from "./paginationComment.component";
 
@@ -16,6 +23,7 @@ const PageCommentPage: FC = () => {
   const comments = useAppSelector((state) => state.comment.comments);
   const page = useAppSelector((state) => state.comment.page);
   const limit = useAppSelector((state) => state.comment.limit);
+  const status = useAppSelector((state) => state.comment.status);
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +31,7 @@ const PageCommentPage: FC = () => {
     const fetchComments = async () => {
       setIsLoading(true);
       try {
-        const data = await getComments("pending", page, limit);
+        const data = await getComments(status, page, limit);
         dispatch(initialComment(data));
       } finally {
         setIsLoading(false);
@@ -31,7 +39,7 @@ const PageCommentPage: FC = () => {
     };
     void fetchComments();
     return () => {};
-  }, [dispatch, limit, page]);
+  }, [dispatch, limit, page, status]);
 
   const renderRating = (rating: number) => {
     return (
@@ -57,13 +65,11 @@ const PageCommentPage: FC = () => {
   const handleEstadoChange = async (id: string, nuevoEstado: StatusComment) => {
     setIsLoading(true);
     try {
-      console.log(`Cambiando estado del comentario ${id} a ${nuevoEstado}`);
-      // Aquí se implementaría la actualización real del estado en la base de datos
-      // const result = await updateCommentStatus(id, nuevoEstado);
-
-      // Después de cambiar el estado, recargamos los comentarios
+      await updateCommentStatus(id, nuevoEstado);
       const data = await getComments("pending", page, limit);
       dispatch(initialComment(data));
+      const dataStatus = await countStatusComments();
+      dispatch(initialCountStatusComments(dataStatus));
     } catch (error) {
       console.error("Error al cambiar estado del comentario:", error);
     } finally {
@@ -71,15 +77,27 @@ const PageCommentPage: FC = () => {
     }
   };
 
+  const getStatus = (status: StatusComment) => {
+    switch (status) {
+      case "pending":
+        return "PENDIENTES";
+      case "approved":
+        return "APROBADOS";
+      case "rejected":
+        return "RECHAZADOS";
+      default:
+        return "TODOS";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6">
         <h1 className="font-bebas text-white text-xl sm:text-knockout sm:text-4xl mb-1 sm:mb-0 tracking-wider">
-          COMENTARIOS
+          COMENTARIOS {getStatus(status)}
         </h1>
       </div>
       <StatusCommentComponent setIsLoading={setIsLoading} />
-
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>

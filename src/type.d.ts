@@ -50,6 +50,7 @@ export interface ICommentSlice {
   countStatusComments: CountStatusComments;
   page: number;
   limit: number;
+  status: StatusComment;
 }
 
 export interface IStudentSlice {

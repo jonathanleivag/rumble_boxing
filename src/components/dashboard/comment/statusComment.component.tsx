@@ -1,13 +1,10 @@
 import { FC, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { countStatusComments } from "@/lib/db/actions/comment.action";
 import {
-  countStatusComments,
-  getComments,
-} from "@/lib/db/actions/comment.action";
-import {
-  initialComment,
   initialCountStatusComments,
   setPageComment,
+  setStatusComment,
 } from "@/lib/redux/features/comment/comment.slice";
 import { StatusComment } from "@/type";
 
@@ -21,8 +18,6 @@ const StatusCommentComponent: FC<StatusCommentComponentProps> = ({
   const countStatus = useAppSelector(
     (status) => status.comment.countStatusComments
   );
-  const page = useAppSelector((state) => state.comment.page);
-  const limit = useAppSelector((state) => state.comment.limit);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -37,9 +32,8 @@ const StatusCommentComponent: FC<StatusCommentComponentProps> = ({
   const handlerChangeStatus = async (status: StatusComment) => {
     if (setIsLoading) setIsLoading(true);
     try {
-      const data = await getComments(status, page, limit);
-      dispatch(initialComment(data));
       dispatch(setPageComment(1));
+      dispatch(setStatusComment(status));
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error changing status:", error.message);
