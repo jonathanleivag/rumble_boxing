@@ -8,6 +8,7 @@ import {
   getMatricula,
   updateMatricula,
 } from "@/lib/db/actions/matricula.action";
+import { toChileanPesos } from "@/utils/toChileanPesos.util";
 
 interface MatriculaData {
   _id?: string;
@@ -202,9 +203,8 @@ const MatriculaPage: FC = () => {
                 )}
               </button>
             </div>
-
             <div className="bg-accent-dark/20 border border-accent-dark/30 rounded-md p-4 mt-6">
-              <h3 className="text-white font-oswald text-lg mb-2">
+              <h3 className="text-white font-oswald text-lg mb-5">
                 Vista previa
               </h3>
               <div className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-lg p-3">
@@ -216,7 +216,7 @@ const MatriculaPage: FC = () => {
                     $
                   </span>
                   <span className="text-primary font-bebas text-3xl">
-                    {matriculaData.value}
+                    {toChileanPesos(matriculaData.value)}
                   </span>
                   <span className="text-accent-medium text-xs self-end mb-1 ml-1">
                     (pago único)
