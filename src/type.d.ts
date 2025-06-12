@@ -1,6 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
 import { Document, Types, PaginateResult } from "mongoose";
-import { countStatusComments } from "./lib/db/actions/comment.action";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -55,6 +54,10 @@ export interface ICommentSlice {
 
 export interface IStudentSlice {
   students: PaginateResult<IStudentData>;
+}
+
+export interface IClassSlice {
+  class: ClassDocumentData[];
 }
 
 export interface ICommentDocument extends ICommentData, Document {}
@@ -190,4 +193,45 @@ export interface CountStatusComments {
   approved: number;
   pending: number;
   rejected: number;
+}
+
+export interface ButtonClassComponentProps {
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export type Difficulty = "essential" | "intermediate" | "advanced";
+
+export interface ClassFormData {
+  name: string;
+  duration: number;
+  difficulty: Difficulty;
+  description: string;
+}
+
+export interface IClassDocument extends ClassFormData, Document {}
+
+export interface ClassDocumentData extends IData, ClassFormData {}
+
+export interface SchedulesClassComponentProps {
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  setFormData: Dispatch<SetStateAction<ClassFormData>>;
+}
+
+export interface ModalClassComponentProps {
+  setFormData: Dispatch<SetStateAction<ClassFormData>>;
+  formData: ClassFormData;
+  formErrors: Partial<Record<keyof ClassFormData, string>>;
+  setFormErrors: Dispatch<
+    SetStateAction<Partial<Record<keyof ClassFormData, string>>>
+  >;
+}
+
+export interface ModalCreateClassComponentProps
+  extends ModalClassComponentProps {
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export interface ModalSchedulesClassComponentProps {
+  setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
 }

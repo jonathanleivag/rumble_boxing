@@ -1,3 +1,5 @@
+"use server";
+
 import mongoose, { Schema } from "mongoose";
 import { IMatriculaDocument } from "@/type";
 
