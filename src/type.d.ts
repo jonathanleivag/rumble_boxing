@@ -235,3 +235,8 @@ export interface ModalCreateClassComponentProps
 export interface ModalSchedulesClassComponentProps {
   setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
 }
+
+export interface CardTypeComponentProps {
+  classData: ClassDocumentData;
+  index: number;
+}

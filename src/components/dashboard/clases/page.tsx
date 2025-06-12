@@ -1,15 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ButtonClassComponent from "./buttonsClass.component";
 import CardTypeComponent from "./cardType.component";
 import { ClassFormData } from "@/type";
 import SchedulesClassComponent from "./schedulesClass.component";
 import ModalCreateClassComponent from "./modalCreteClass.component";
 import ModalSchedulesClassComponent from "./modalSchedulesClass.component";
-
-export type ClassCategory = "Boxeo Básico" | "HIIT Boxing" | "Sparring Técnico";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { getAllClass } from "@/lib/db/actions/class.action";
+import { initialClass } from "@/lib/redux/features/class/class.slice";
 
 const PageClassComponent: FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -25,6 +26,18 @@ const PageClassComponent: FC = () => {
   const [formErrors, setFormErrors] = useState<
     Partial<Record<keyof ClassFormData, string>>
   >({});
+
+  const dispatch = useAppDispatch();
+  const classData = useAppSelector((state) => state.class.class);
+
+  useEffect(() => {
+    const dataFetch = async () => {
+      const data = await getAllClass();
+      dispatch(initialClass(data));
+    };
+    void dataFetch();
+    return () => {};
+  }, [dispatch]);
 
   return (
     <div className="space-y-8">
@@ -64,7 +77,13 @@ const PageClassComponent: FC = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <CardTypeComponent />
+          {classData.map((item, index) => (
+            <CardTypeComponent
+              key={item._id.toString()}
+              classData={item}
+              index={index + 1}
+            />
+          ))}
         </div>
       </div>
 

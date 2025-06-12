@@ -14,6 +14,12 @@ export const createClass = async (
     throw new Error("Ya existe la clase con ese nombre");
   }
 
+  const allClass = await ClassFormDataModel.find();
+  const classCount = allClass.length;
+  if (classCount >= 6) {
+    throw new Error("No se pueden crear más de 6 clases");
+  }
+
   if (data.duration <= 0) {
     throw new Error("La duración debe ser mayor a 0");
   }
@@ -29,4 +35,19 @@ export const createClass = async (
     createdAt: newClass.createdAt,
     updatedAt: newClass.updatedAt,
   };
+};
+
+export const getAllClass = async (): Promise<ClassDocumentData[]> => {
+  await connectToMongoDB();
+  const classes = await ClassFormDataModel.find();
+
+  return classes.map((classData) => ({
+    _id: classData._id.toString(),
+    name: classData.name,
+    duration: classData.duration,
+    difficulty: classData.difficulty,
+    description: classData.description,
+    createdAt: classData.createdAt.toString(),
+    updatedAt: classData.updatedAt.toString(),
+  }));
 };

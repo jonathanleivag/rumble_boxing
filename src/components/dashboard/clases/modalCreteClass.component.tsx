@@ -65,7 +65,7 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
     setIsSubmitting(true);
 
     try {
-      const className = formData.name;
+      const className = formData.name.toUpperCase().trim();
       const classTime = formData.duration;
 
       const data = await createClass({

@@ -9,7 +9,7 @@ export const classSlice = createSlice({
   name: "class",
   initialState,
   reducers: {
-    initialStudents: (state, action: PayloadAction<ClassDocumentData[]>) => {
+    initialClass: (state, action: PayloadAction<ClassDocumentData[]>) => {
       state.class = action.payload;
     },
     addClass: (state, action: PayloadAction<ClassDocumentData>) => {
@@ -18,6 +18,6 @@ export const classSlice = createSlice({
   },
 });
 
-export const { initialStudents, addClass } = classSlice.actions;
+export const { initialClass, addClass } = classSlice.actions;
 
 export default classSlice.reducer;
