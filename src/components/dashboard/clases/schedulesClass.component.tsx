@@ -3,13 +3,12 @@
 import { motion } from "framer-motion";
 import { FC } from "react";
 import toast from "react-hot-toast";
-import { ClassCategory } from "./page";
 import { SchedulesClassComponentProps } from "@/type";
 
 interface ClassInfo {
   start: string;
   end: string;
-  class: ClassCategory;
+  class: string;
   duration: string;
   description: string;
 }

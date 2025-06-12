@@ -198,6 +198,7 @@ export interface CountStatusComments {
 export interface ButtonClassComponentProps {
   setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
   setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
+  countClass: number;
 }
 
 export type Difficulty = "essential" | "intermediate" | "advanced";
@@ -239,4 +240,10 @@ export interface ModalSchedulesClassComponentProps {
 export interface CardTypeComponentProps {
   classData: ClassDocumentData;
   index: number;
+}
+
+export interface ConfirmOptions {
+  message: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
 }

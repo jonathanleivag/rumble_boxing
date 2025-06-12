@@ -53,6 +53,7 @@ const PageClassComponent: FC = () => {
       </motion.div>
 
       <ButtonClassComponent
+        countClass={classData.length}
         setIsCreateModalOpen={setIsCreateModalOpen}
         setIsGroupModalOpen={setIsGroupModalOpen}
       />

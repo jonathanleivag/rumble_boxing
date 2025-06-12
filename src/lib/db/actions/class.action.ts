@@ -51,3 +51,15 @@ export const getAllClass = async (): Promise<ClassDocumentData[]> => {
     updatedAt: classData.updatedAt.toString(),
   }));
 };
+
+export const deleteClass = async (id: string): Promise<string> => {
+  await connectToMongoDB();
+  const classData = await ClassFormDataModel.findById(id);
+
+  if (!classData) {
+    throw new Error("Clase no encontrada");
+  }
+
+  await ClassFormDataModel.deleteOne({ _id: id });
+  return id;
+};

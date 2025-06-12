@@ -75,8 +75,6 @@ const CallComponent: FC = () => {
   };
 
   const handleCommentSubmit = (commentData: ICommentData) => {
-    console.log({ commentData });
-
     if (session?.user) {
       if (!edit) {
         dispatch(addComment(commentData));

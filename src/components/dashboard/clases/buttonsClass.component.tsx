@@ -8,6 +8,7 @@ import { FC } from "react";
 const ButtonClassComponent: FC<ButtonClassComponentProps> = ({
   setIsCreateModalOpen,
   setIsGroupModalOpen,
+  countClass,
 }) => {
   return (
     <motion.div
@@ -110,8 +111,8 @@ const ButtonClassComponent: FC<ButtonClassComponentProps> = ({
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
             </svg>
           </div>
-          <div>
-            8
+          <div className="text-white font-oswald">
+            {countClass}
             <div className="text-xs text-accent-medium font-montserrat">
               Clases en total
             </div>

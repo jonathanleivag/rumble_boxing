@@ -15,9 +15,14 @@ export const classSlice = createSlice({
     addClass: (state, action: PayloadAction<ClassDocumentData>) => {
       state.class.push(action.payload);
     },
+    deleteClassSlice: (state, action: PayloadAction<string>) => {
+      state.class = state.class.filter(
+        (cls) => cls._id.toString() !== action.payload
+      );
+    },
   },
 });
 
-export const { initialClass, addClass } = classSlice.actions;
+export const { initialClass, addClass, deleteClassSlice } = classSlice.actions;
 
 export default classSlice.reducer;

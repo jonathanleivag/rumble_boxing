@@ -18,7 +18,6 @@ export const crearStudent = async (
   }
 
   const plan = await getPriceById(data.plan.toString());
-  console.log("🚀 ~ data.plan:", data.plan);
 
   if (data.avatar === "") delete data.avatar;
 
@@ -37,6 +36,7 @@ export const crearStudent = async (
     createDate: newStudent.createDate,
     plan: newStudent.plan,
     assistance: newStudent.assistance,
+    updateAssistance: newStudent.updateAssistance,
     status: newStudent.status,
     avatar: newStudent.avatar,
     _id: newStudent._id,
