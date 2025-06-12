@@ -4,11 +4,25 @@ import { ModalSchedulesClassComponentProps } from "@/type";
 import { motion } from "framer-motion";
 import { ChangeEvent, FC, FormEvent, useState } from "react";
 import toast from "react-hot-toast";
+import { useAppSelector } from "@/lib/redux/hooks";
+
+interface ClassSchedule {
+  startTime: string;
+  endTime: string;
+}
 
 interface GroupFormData {
   name: string;
   description: string;
   color: string;
+  selectedClasses: string[];
+  classSchedules: Record<string, ClassSchedule>; // Mapa de ID de clase a horario
+}
+
+interface ClassWithSchedule {
+  classId: string;
+  startTime: string;
+  endTime: string;
 }
 
 interface ClassGroup {
@@ -16,6 +30,7 @@ interface ClassGroup {
   name: string;
   description: string;
   color: string;
+  classes: ClassWithSchedule[];
 }
 
 const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
@@ -26,7 +41,12 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
     name: "",
     description: "",
     color: "#E02020", // Rojo por defecto (primary)
+    selectedClasses: [],
+    classSchedules: {},
   });
+
+  // Obtener las clases del estado global
+  const classData = useAppSelector((state) => state.class.class);
 
   const [groupFormErrors, setGroupFormErrors] = useState<
     Partial<Record<keyof GroupFormData, string>>
@@ -63,6 +83,10 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
     if (!groupFormData.color.trim() || !groupFormData.color.startsWith("#"))
       errors.color = "Selecciona un color válido";
 
+    // Validar selección de al menos una clase
+    if (groupFormData.selectedClasses.length === 0)
+      errors.selectedClasses = "Debes seleccionar al menos una clase";
+
     setGroupFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -84,16 +108,28 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
       // Generar un nuevo ID único
       const newGroupId = `group-${Date.now()}`;
 
+      // Convertir los horarios de clases al formato deseado
+      const classesWithSchedules: ClassWithSchedule[] =
+        groupFormData.selectedClasses.map((classId) => ({
+          classId,
+          startTime:
+            groupFormData.classSchedules[classId]?.startTime || "08:00",
+          endTime: groupFormData.classSchedules[classId]?.endTime || "09:00",
+        }));
+
       // Crear el nuevo grupo
       const newGroup: ClassGroup = {
         id: newGroupId,
         name: groupFormData.name,
         description: groupFormData.description,
         color: groupFormData.color,
+        classes: classesWithSchedules,
       };
 
       // Actualizar la lista de grupos
       console.log(`Agregando grupo: ${newGroup.name}`);
+      console.log("Detalles del grupo:", newGroup);
+      console.log(classesWithSchedules);
 
       // Éxito
       toast.success(
@@ -111,6 +147,8 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
         name: "",
         description: "",
         color: "#E02020",
+        selectedClasses: [],
+        classSchedules: {},
       });
     } catch (e) {
       // Error
@@ -242,6 +280,129 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
             )}
           </div>
 
+          <div className="mb-6">
+            <label className="block text-accent-medium font-montserrat text-xs mb-1">
+              Selecciona las Clases
+            </label>
+            <div className="bg-accent-dark/20 p-4 rounded-lg border border-accent-dark/30 max-h-48 overflow-y-auto">
+              {classData && classData.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {classData.map((classItem) => (
+                    <div
+                      key={classItem._id.toString()}
+                      className={`p-3 rounded-lg transition-all duration-200 flex items-center gap-2 ${
+                        groupFormData.selectedClasses.includes(
+                          classItem._id.toString()
+                        )
+                          ? "bg-primary/20 border border-primary/30"
+                          : "bg-accent-dark/40 border border-accent-dark/30 hover:bg-accent-dark/60"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        id={`class-${classItem._id.toString()}`}
+                        className="w-4 h-4 accent-primary"
+                        checked={groupFormData.selectedClasses.includes(
+                          classItem._id.toString()
+                        )}
+                        onChange={(e) => {
+                          const classId = classItem._id.toString();
+                          if (e.target.checked) {
+                            // Cuando se selecciona una clase, inicializar su horario con valores por defecto
+                            setGroupFormData({
+                              ...groupFormData,
+                              selectedClasses: [
+                                ...groupFormData.selectedClasses,
+                                classId,
+                              ],
+                              classSchedules: {
+                                ...groupFormData.classSchedules,
+                                [classId]: {
+                                  startTime: "08:00", // Hora de inicio por defecto
+                                  endTime: "09:00", // Hora de fin por defecto
+                                },
+                              },
+                            });
+                          } else {
+                            // Cuando se deselecciona una clase, eliminar su horario
+                            const updatedSchedules = {
+                              ...groupFormData.classSchedules,
+                            };
+                            delete updatedSchedules[classId];
+
+                            setGroupFormData({
+                              ...groupFormData,
+                              selectedClasses:
+                                groupFormData.selectedClasses.filter(
+                                  (id) => id !== classId
+                                ),
+                              classSchedules: updatedSchedules,
+                            });
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={`class-${classItem._id.toString()}`}
+                        className="flex-grow cursor-pointer"
+                      >
+                        <span className="font-oswald text-white block text-sm">
+                          {classItem.name}
+                        </span>
+                        <span className="text-accent-medium text-xs">
+                          {classItem.duration} min -{" "}
+                          {classItem.difficulty === "essential"
+                            ? "Básico"
+                            : classItem.difficulty === "intermediate"
+                            ? "Intermedio"
+                            : "Avanzado"}
+                        </span>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-accent-medium py-4">
+                  No hay clases disponibles. Por favor, crea clases primero.
+                </p>
+              )}
+            </div>
+            {groupFormErrors.selectedClasses ? (
+              <p className="text-red-500 text-xs mt-1 flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="w-3 h-3 mr-1"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                {groupFormErrors.selectedClasses}
+              </p>
+            ) : (
+              <p className="text-xs text-accent-medium mt-1 flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-3 h-3 mr-1"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                  />
+                </svg>
+                Selecciona las clases que pertenecerán a este grupo
+              </p>
+            )}
+          </div>
+
           <div>
             <label className="block text-accent-medium font-montserrat text-xs mb-1">
               Color del Grupo
@@ -309,10 +470,117 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
                     {groupFormData.description || "Sin descripción"}
                   </p>
                 </div>
-                <div className="p-3 bg-accent-dark/40 flex items-center justify-center">
-                  <p className="text-white/50 font-montserrat text-xs">
-                    Aquí aparecerán las clases de este grupo
-                  </p>
+                <div className="p-3 bg-accent-dark/40">
+                  {groupFormData.selectedClasses.length > 0 ? (
+                    <div className="space-y-2">
+                      {groupFormData.selectedClasses.map((selectedClassId) => {
+                        const selectedClass = classData.find(
+                          (c) => c._id.toString() === selectedClassId
+                        );
+                        return selectedClass ? (
+                          <div
+                            key={selectedClass._id.toString()}
+                            className="flex flex-col py-2 px-3 bg-accent-dark/30 rounded-md border border-accent-dark/60"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <span className="text-white font-oswald text-sm block">
+                                  {selectedClass.name}
+                                </span>
+                                <span className="text-accent-medium text-xs">
+                                  {selectedClass.duration} min
+                                </span>
+                              </div>
+                              <span
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  selectedClass.difficulty === "essential"
+                                    ? "bg-green-500/30 text-green-400"
+                                    : selectedClass.difficulty ===
+                                      "intermediate"
+                                    ? "bg-yellow-500/30 text-yellow-400"
+                                    : "bg-red-500/30 text-red-400"
+                                }`}
+                              >
+                                {selectedClass.difficulty === "essential"
+                                  ? "Básico"
+                                  : selectedClass.difficulty === "intermediate"
+                                  ? "Intermedio"
+                                  : "Avanzado"}
+                              </span>
+                            </div>
+
+                            {/* Selección de horario para la clase */}
+                            <div className="grid grid-cols-2 gap-2 mt-1 pt-2 border-t border-accent-dark/30">
+                              <div>
+                                <label className="block text-accent-medium font-montserrat text-xs mb-1">
+                                  Hora inicio
+                                </label>
+                                <input
+                                  type="time"
+                                  value={
+                                    groupFormData.classSchedules[
+                                      selectedClass._id.toString()
+                                    ]?.startTime || "08:00"
+                                  }
+                                  onChange={(e) => {
+                                    const classId =
+                                      selectedClass._id.toString();
+                                    setGroupFormData({
+                                      ...groupFormData,
+                                      classSchedules: {
+                                        ...groupFormData.classSchedules,
+                                        [classId]: {
+                                          ...groupFormData.classSchedules[
+                                            classId
+                                          ],
+                                          startTime: e.target.value,
+                                        },
+                                      },
+                                    });
+                                  }}
+                                  className="w-full bg-accent-dark/60 border border-accent-dark/50 text-white rounded-md p-1 text-xs font-montserrat focus:outline-none focus:ring-1 focus:ring-primary"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-accent-medium font-montserrat text-xs mb-1">
+                                  Hora fin
+                                </label>
+                                <input
+                                  type="time"
+                                  value={
+                                    groupFormData.classSchedules[
+                                      selectedClass._id.toString()
+                                    ]?.endTime || "09:00"
+                                  }
+                                  onChange={(e) => {
+                                    const classId =
+                                      selectedClass._id.toString();
+                                    setGroupFormData({
+                                      ...groupFormData,
+                                      classSchedules: {
+                                        ...groupFormData.classSchedules,
+                                        [classId]: {
+                                          ...groupFormData.classSchedules[
+                                            classId
+                                          ],
+                                          endTime: e.target.value,
+                                        },
+                                      },
+                                    });
+                                  }}
+                                  className="w-full bg-accent-dark/60 border border-accent-dark/50 text-white rounded-md p-1 text-xs font-montserrat focus:outline-none focus:ring-1 focus:ring-primary"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-white/50 font-montserrat text-xs text-center">
+                      No has seleccionado clases para este grupo
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

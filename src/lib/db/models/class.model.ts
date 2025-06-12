@@ -7,7 +7,7 @@ const classSchema = new Schema<IClassDocument>(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "El nombre de la clase es obligatorio"],
       trim: true,
       unique: true,
     },
@@ -18,11 +18,11 @@ const classSchema = new Schema<IClassDocument>(
     difficulty: {
       type: String,
       enum: ["essential", "intermediate", "advanced"],
-      required: true,
+      required: [true, "La dificultad es obligatoria"],
     },
     description: {
       type: String,
-      required: true,
+      required: [true, "La descripción es obligatoria"],
       trim: true,
     },
   },

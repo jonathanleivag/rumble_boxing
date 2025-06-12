@@ -215,6 +215,16 @@ export interface IClassDocument extends ClassFormData, Document {}
 
 export interface ClassDocumentData extends IData, ClassFormData {}
 
+export interface Schedules {
+  name: string;
+  description: string;
+  color: string;
+  classes: ClassDocumentData[];
+}
+
+export interface ISchedulesDocument extends Schedules, Document {}
+export interface ISchedulesData extends IData, Schedules {}
+
 export interface SchedulesClassComponentProps {
   setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
   setFormData: Dispatch<SetStateAction<ClassFormData>>;
