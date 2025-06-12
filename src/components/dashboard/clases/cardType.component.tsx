@@ -73,10 +73,6 @@ const CardTypeComponent: FC<CardTypeComponentProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6, duration: 0.3 }}
-      whileHover={{
-        y: -5,
-        boxShadow: "0 10px 25px -5px rgba(224,32,32,0.2)",
-      }}
       className="bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] rounded-xl p-5 border border-accent-dark/30 transition-all duration-300"
     >
       <div className="flex space-x-2 my-3 justify-end">
@@ -128,7 +124,7 @@ const CardTypeComponent: FC<CardTypeComponentProps> = ({
       </div>
       <div className="flex items-center mb-3">
         <div
-          className={`backdrop-blur-sm px-3 py-1 rounded-full mr-3 ${getColorByDifficulty(
+          className={`backdrop-blur-sm px-3 py-1 rounded-full mr-3 flex flex-row justify-center items-center ${getColorByDifficulty(
             classData.difficulty
           )}`}
         >
