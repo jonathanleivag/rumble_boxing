@@ -1,9 +1,17 @@
 "use client";
 
-import { createClass } from "@/lib/db/actions/class.action";
-import { addClass } from "@/lib/redux/features/class/class.slice";
-import { useAppDispatch } from "@/lib/redux/hooks";
-import { ClassFormData, ModalCreateClassComponentProps } from "@/type";
+import { createClass, updateClass } from "@/lib/db/actions/class.action";
+import {
+  addClass,
+  editClass,
+  selectEditClass,
+} from "@/lib/redux/features/class/class.slice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import {
+  ClassDocumentData,
+  ClassFormData,
+  ModalCreateClassComponentProps,
+} from "@/type";
 import { motion } from "framer-motion";
 import { ChangeEvent, FC, FormEvent, useState } from "react";
 import toast from "react-hot-toast";
@@ -17,6 +25,7 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const edit = useAppSelector((state) => state.class.edit);
 
   const validateForm = (): boolean => {
     const errors: Partial<Record<keyof ClassFormData, string>> = {};
@@ -68,19 +77,32 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
       const className = formData.name.toUpperCase().trim();
       const classTime = formData.duration;
 
-      const data = await createClass({
-        name: className,
-        duration: classTime,
-        difficulty: formData.difficulty,
-        description: formData.description,
-      });
+      let data: ClassDocumentData;
 
-      dispatch(addClass(data));
+      if (edit) {
+        data = await updateClass(edit._id.toString(), {
+          name: className,
+          duration: classTime,
+          difficulty: formData.difficulty,
+          description: formData.description,
+        });
+
+        dispatch(editClass(data));
+      } else {
+        data = await createClass({
+          name: className,
+          duration: classTime,
+          difficulty: formData.difficulty,
+          description: formData.description,
+        });
+
+        dispatch(addClass(data));
+      }
 
       toast.success(
         <div className="font-montserrat">
           <strong className="block font-oswald text-white">
-            ¡Clase creada!
+            {edit ? "¡Clase Actualizada!" : "¡Clase creada!"}
           </strong>
           <span className="text-xs">
             {className} - {""} {classTime}
@@ -101,7 +123,7 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
         toast.error(
           <div className="font-montserrat">
             <strong className="block font-oswald text-white">
-              Error al crear la clase
+              Error al {edit ? "Actualizar la clase" : "crear la clase"}
             </strong>
             <span className="text-xs">
               {e.message || "Por favor, intenta nuevamente más tarde."}
@@ -111,6 +133,19 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleEditClass = () => {
+    setIsCreateModalOpen(false);
+    if (edit) {
+      setFormData({
+        name: "",
+        duration: 0,
+        description: "",
+        difficulty: "essential",
+      });
+      dispatch(selectEditClass(false));
     }
   };
 
@@ -124,11 +159,11 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="font-oswald text-white text-2xl">
-              Crear Nueva Clase
+              {edit ? `Editar ${edit.name}` : "Crear Nueva Clase"}
             </h2>
           </div>
           <button
-            onClick={() => setIsCreateModalOpen(false)}
+            onClick={handleEditClass}
             className="cursor-pointer text-accent-medium hover:text-white transition-colors p-1"
           >
             <svg
@@ -276,7 +311,7 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-accent-dark/30">
             <button
               type="button"
-              onClick={() => setIsCreateModalOpen(false)}
+              onClick={handleEditClass}
               className="cursor-pointer bg-accent-dark/60 hover:bg-accent-dark/80 text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
             >
               Cancelar
@@ -312,7 +347,7 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Creando clase...</span>
+                  <span> {edit ? "Editando" : "Creando"} clase...</span>
                 </>
               ) : (
                 <>
@@ -330,7 +365,7 @@ const ModalCreateClassComponent: FC<ModalCreateClassComponentProps> = ({
                       d="M12 4.5v15m7.5-7.5h-15"
                     />
                   </svg>
-                  <span>Crear Clase</span>
+                  <span>{edit ? "Editar" : "Crear"} Clase</span>
                 </>
               )}
             </button>

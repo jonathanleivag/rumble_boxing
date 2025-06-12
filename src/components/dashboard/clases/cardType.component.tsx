@@ -1,9 +1,12 @@
 'use client";';
 
 import { deleteClass } from "@/lib/db/actions/class.action";
-import { deleteClassSlice } from "@/lib/redux/features/class/class.slice";
+import {
+  deleteClassSlice,
+  selectEditClass,
+} from "@/lib/redux/features/class/class.slice";
 import { useAppDispatch } from "@/lib/redux/hooks";
-import { CardTypeComponentProps, Difficulty } from "@/type";
+import { CardTypeComponentProps, ClassDocumentData, Difficulty } from "@/type";
 import { showConfirmToast } from "@/utils/showConfirmToast";
 import { motion } from "framer-motion";
 import { FC } from "react";
@@ -11,6 +14,8 @@ import { FC } from "react";
 const CardTypeComponent: FC<CardTypeComponentProps> = ({
   classData,
   index,
+  setIsCreateModalOpen,
+  setFormData,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -51,6 +56,18 @@ const CardTypeComponent: FC<CardTypeComponentProps> = ({
     });
   };
 
+  const handleEditClass = (e: React.MouseEvent, edit: ClassDocumentData) => {
+    e.stopPropagation();
+    setFormData({
+      name: edit.name,
+      duration: edit.duration,
+      difficulty: edit.difficulty,
+      description: edit.description,
+    });
+    dispatch(selectEditClass(edit));
+    setIsCreateModalOpen(true);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -64,11 +81,9 @@ const CardTypeComponent: FC<CardTypeComponentProps> = ({
     >
       <div className="flex space-x-2 my-3 justify-end">
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
+          onClick={(e) => handleEditClass(e, classData)}
           className="cursor-pointer text-accent-medium hover:text-white transition-colors"
-          title="Editar grupo"
+          title="Editar clase"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

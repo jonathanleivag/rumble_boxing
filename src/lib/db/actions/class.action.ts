@@ -63,3 +63,36 @@ export const deleteClass = async (id: string): Promise<string> => {
   await ClassFormDataModel.deleteOne({ _id: id });
   return id;
 };
+
+export const updateClass = async (
+  id: string,
+  data: ClassFormData
+): Promise<ClassDocumentData> => {
+  await connectToMongoDB();
+  const classData = await ClassFormDataModel.findById(id);
+
+  if (!classData) {
+    throw new Error("Clase no encontrada");
+  }
+
+  if (data.duration <= 0) {
+    throw new Error("La duración debe ser mayor a 0");
+  }
+
+  classData.name = data.name;
+  classData.duration = data.duration;
+  classData.difficulty = data.difficulty;
+  classData.description = data.description;
+
+  await classData.save();
+
+  return {
+    _id: classData._id.toString(),
+    name: classData.name,
+    duration: classData.duration,
+    difficulty: classData.difficulty,
+    description: classData.description,
+    createdAt: classData.createdAt.toString(),
+    updatedAt: classData.updatedAt.toString(),
+  };
+};

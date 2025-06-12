@@ -83,6 +83,8 @@ const PageClassComponent: FC = () => {
               key={item._id.toString()}
               classData={item}
               index={index + 1}
+              setIsCreateModalOpen={setIsCreateModalOpen}
+              setFormData={setFormData}
             />
           ))}
         </div>

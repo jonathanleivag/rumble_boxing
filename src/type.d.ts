@@ -58,6 +58,7 @@ export interface IStudentSlice {
 
 export interface IClassSlice {
   class: ClassDocumentData[];
+  edit: ClassDocumentData | false;
 }
 
 export interface ICommentDocument extends ICommentData, Document {}
@@ -240,6 +241,8 @@ export interface ModalSchedulesClassComponentProps {
 export interface CardTypeComponentProps {
   classData: ClassDocumentData;
   index: number;
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  setFormData: Dispatch<SetStateAction<ClassFormData>>;
 }
 
 export interface ConfirmOptions {
