@@ -1,11 +1,11 @@
 import { ConfirmOptions } from "@/type";
-import { toast, Toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
-export function showConfirmToast({
+export const showConfirmToast = ({
   message,
   onConfirm,
   onCancel,
-}: ConfirmOptions) {
+}: ConfirmOptions) => {
   toast(
     (t) => (
       <div className="text-white font-montserrat text-sm space-y-2">
@@ -15,7 +15,6 @@ export function showConfirmToast({
             onClick={() => {
               toast.dismiss(t.id);
               onConfirm();
-              toast.success("Grupo eliminado correctamente");
             }}
             className="cursor-pointer bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-oswald"
           >
@@ -35,7 +34,7 @@ export function showConfirmToast({
     ),
     { duration: 10000, position: "top-center" }
   );
-}
+};
 
 /*
 

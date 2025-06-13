@@ -9,6 +9,8 @@ const ButtonClassComponent: FC<ButtonClassComponentProps> = ({
   setIsCreateModalOpen,
   setIsGroupModalOpen,
   countClass,
+  countGroup,
+  totalClasses,
 }) => {
   return (
     <motion.div
@@ -138,7 +140,7 @@ const ButtonClassComponent: FC<ButtonClassComponentProps> = ({
             </svg>
           </div>
           <div>
-            <div className="text-white font-oswald">8</div>
+            <div className="text-white font-oswald"> {countGroup} </div>
             <div className="text-xs text-accent-medium font-montserrat">
               Grupos de clases
             </div>
@@ -162,7 +164,7 @@ const ButtonClassComponent: FC<ButtonClassComponentProps> = ({
             </svg>
           </div>
           <div>
-            <div className="text-white font-oswald">10 min</div>
+            <div className="text-white font-oswald">{totalClasses} min</div>
             <div className="text-xs text-accent-medium font-montserrat">
               Tiempo total de clases
             </div>

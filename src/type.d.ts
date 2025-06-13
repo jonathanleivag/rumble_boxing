@@ -26,7 +26,7 @@ export interface CommentModalProps {
 }
 
 export interface IData {
-  _id: Types.ObjectId;
+  _id: Types.ObjectId | string;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,6 +59,13 @@ export interface IStudentSlice {
 export interface IClassSlice {
   class: ClassDocumentData[];
   edit: ClassDocumentData | false;
+}
+
+export interface IScheduleSlice {
+  schedules: ISchedulesData[];
+  edit: boolean;
+  nameEdit: string;
+  idEdit: string;
 }
 
 export interface ICommentDocument extends ICommentData, Document {}
@@ -200,6 +207,8 @@ export interface ButtonClassComponentProps {
   setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
   setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
   countClass: number;
+  countGroup: number;
+  totalClasses: number;
 }
 
 export type Difficulty = "essential" | "intermediate" | "advanced";
@@ -215,19 +224,34 @@ export interface IClassDocument extends ClassFormData, Document {}
 
 export interface ClassDocumentData extends IData, ClassFormData {}
 
+export interface Classes {
+  class: {
+    _id: Types.ObjectId | string;
+    name: string;
+    duration: number;
+    difficulty: Difficulty;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  startTime: string;
+  endTime: string;
+}
 export interface Schedules {
   name: string;
   description: string;
   color: string;
-  classes: ClassDocumentData[];
+  classes: Classes[];
 }
 
 export interface ISchedulesDocument extends Schedules, Document {}
 export interface ISchedulesData extends IData, Schedules {}
 
+export type CreateSchedule = Omit<ISchedulesData, "_id"> & { _id: string };
+
 export interface SchedulesClassComponentProps {
   setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
-  setFormData: Dispatch<SetStateAction<ClassFormData>>;
+  setFormData: Dispatch<SetStateAction<GroupFormData>>;
 }
 
 export interface ModalClassComponentProps {
@@ -246,6 +270,8 @@ export interface ModalCreateClassComponentProps
 
 export interface ModalSchedulesClassComponentProps {
   setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
+  setGroupFormData: Dispatch<SetStateAction<GroupFormData>>;
+  groupFormData: GroupFormData;
 }
 
 export interface CardTypeComponentProps {
@@ -259,4 +285,20 @@ export interface ConfirmOptions {
   message: string;
   onConfirm: () => void;
   onCancel?: () => void;
+}
+
+export interface ClassSchedule {
+  startTime: string;
+}
+
+export interface TimeInputRefs {
+  [classId: string]: HTMLInputElement | null;
+}
+
+export interface GroupFormData {
+  name: string;
+  description: string;
+  color: string;
+  selectedClasses: string[];
+  classSchedules: Record<string, ClassSchedule>;
 }

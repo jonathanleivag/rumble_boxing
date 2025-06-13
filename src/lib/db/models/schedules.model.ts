@@ -24,8 +24,19 @@ const schedulesSchema = new Schema<ISchedulesDocument>(
     classes: {
       type: [
         {
-          type: Schema.Types.ObjectId,
-          ref: "ClassFormData",
+          class: {
+            type: Schema.Types.ObjectId,
+            ref: "ClassFormData",
+            required: true,
+          },
+          startTime: {
+            type: String,
+            required: true,
+          },
+          endTime: {
+            type: String,
+            required: true,
+          },
         },
       ],
       default: [],

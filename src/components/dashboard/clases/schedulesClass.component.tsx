@@ -1,146 +1,65 @@
 'use client";';
 
 import { motion } from "framer-motion";
-import { FC } from "react";
+import { FC, MouseEvent } from "react";
 import toast from "react-hot-toast";
-import { SchedulesClassComponentProps } from "@/type";
-
-interface ClassInfo {
-  start: string;
-  end: string;
-  class: string;
-  duration: string;
-  description: string;
-}
-
-interface GroupClass {
-  id: string;
-  name: string;
-  description: string;
-  color: string;
-  class: ClassInfo[];
-}
+import { ISchedulesData, SchedulesClassComponentProps } from "@/type";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { showConfirmToast } from "@/utils/showConfirmToast";
+import { deleteSchedule } from "@/lib/db/actions/schedules.action";
+import {
+  deleteScheduleSlice,
+  isEditSchedule,
+} from "@/lib/redux/features/schedule/schedule.slice";
 
 const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
   setIsCreateModalOpen,
   setFormData,
 }) => {
-  const initialScheduleData: GroupClass[] = [
-    {
-      id: "group-1",
-      name: "Entrenamiento Regular",
-      description: "Clases regulares semanales",
-      color: "#E02020",
-      class: [
-        {
-          start: "10:00 AM",
-          end: "11:00 AM",
-          class: "Boxeo Básico",
-          duration: "60 minutos",
-          description: "Técnica y fundamentos",
-        },
-        {
-          start: "05:00 PM",
-          end: "06:00 PM",
-          class: "HIIT Boxing",
-          duration: "60 minutos",
-          description: "Alta intensidad",
-        },
-        {
-          start: "07:00 PM",
-          end: "08:00 PM",
-          class: "Sparring Técnico",
-          duration: "60 minutos",
-          description: "Combate controlado",
-        },
-      ],
-    },
-    {
-      id: "group-2",
-      name: "Clases Especiales",
-      description: "Sesiones especiales y eventos",
-      color: "#F97316",
-      class: [
-        {
-          start: "10:00 AM",
-          end: "11:00 AM",
-          class: "Boxeo Básico",
-          duration: "60 minutos",
-          description: "Técnica y fundamentos",
-        },
-        {
-          start: "05:00 PM",
-          end: "06:00 PM",
-          class: "HIIT Boxing",
-          duration: "60 minutos",
-          description: "Alta intensidad",
-        },
-        {
-          start: "07:00 PM",
-          end: "08:00 PM",
-          class: "Sparring Técnico",
-          duration: "60 minutos",
-          description: "Combate controlado",
-        },
-      ],
-    },
-    {
-      id: "group-3",
-      name: "Técnica Avanzada",
-      description: "Entrenamiento para boxeadores experimentados",
-      color: "#6366F1",
-      class: [],
-    },
-  ];
+  const schedules = useAppSelector((state) => state.schedule.schedules);
+  const dispatch = useAppDispatch();
 
-  const handleEditGroup = (groupId: string) => {
-    // const groupToEdit = classGroups.find((g) => g.id === groupId);
-    // if (groupToEdit) {
-    //   setGroupFormData({
-    //     name: groupToEdit.name,
-    //     description: groupToEdit.description,
-    //     color: groupToEdit.color,
-    //   });
-    //   setSelectedGroupId(groupId);
-    //   setIsEditGroupModalOpen(true);
-    // }
+  const handleEditGroup = (e: MouseEvent, group: ISchedulesData) => {
+    e.stopPropagation();
+    setFormData({
+      name: group.name,
+      description: group.description,
+      color: group.color,
+      selectedClasses: group.classes.map((cls) => cls.class._id.toString()),
+      classSchedules: {
+        ...group.classes.reduce((acc, cls) => {
+          acc[cls.class._id.toString()] = {
+            startTime: cls.startTime,
+          };
+          return acc;
+        }, {} as Record<string, { startTime: string }>),
+      },
+    });
+    setIsCreateModalOpen(true);
+    dispatch(
+      isEditSchedule({
+        name: group.name,
+        isEdit: true,
+        id: group._id.toString(),
+      })
+    );
   };
 
-  // Función para eliminar un grupo
   const handleDeleteGroup = (groupId: string) => {
-    toast(
-      (t) => (
-        <div className="text-white font-montserrat text-sm space-y-2">
-          <p>¿Estás seguro de que deseas eliminar este grupo?</p>
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => {
-                toast.dismiss(t.id);
-                console.log(`Eliminando grupo: ${groupId}`);
-                toast.success("Grupo eliminado correctamente");
-              }}
-              className="cursor-pointer bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-oswald"
-            >
-              Eliminar
-            </button>
-            <button
-              onClick={() => toast.dismiss(t.id)}
-              className="cursor-pointer bg-accent-dark/40 hover:bg-accent-dark/60 text-white px-3 py-1 rounded text-xs font-oswald"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      ),
-      { duration: 10000, position: "top-center" }
-    );
-    return;
+    showConfirmToast({
+      message: "¿Estás seguro de que deseas eliminar este grupo?",
+      onConfirm: async () => {
+        await deleteSchedule(groupId);
+        toast.success("Grupo eliminado correctamente");
+        dispatch(deleteScheduleSlice(groupId));
+      },
+    });
   };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {initialScheduleData.map((data, groupIndex) => {
-        if (data.class.length === 0) {
+      {schedules.map((data, groupIndex) => {
+        if (data.classes.length === 0) {
           return (
             <motion.div
               key={data.name}
@@ -156,10 +75,7 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex space-x-2">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditGroup(data.name);
-                      }}
+                      onClick={(e) => handleEditGroup(e, data)}
                       className="cursor-pointer text-accent-medium hover:text-white transition-colors"
                       title="Editar grupo"
                     >
@@ -186,7 +102,7 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteGroup(data.name);
+                        handleDeleteGroup(data._id.toString());
                       }}
                       className="cursor-pointer text-primary hover:text-red-500 transition-colors"
                       title="Eliminar grupo"
@@ -241,13 +157,7 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
                   No hay clases programadas para este grupo.
                 </p>
                 <button
-                  onClick={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      groupId: data.name,
-                    }));
-                    setIsCreateModalOpen(true);
-                  }}
+                  onClick={(e) => handleEditGroup(e, data)}
                   className="cursor-pointer mt-4 bg-accent-dark/30 hover:bg-accent-dark/50 text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-colors duration-200 border border-accent-dark/20 flex items-center"
                 >
                   <svg
@@ -268,7 +178,6 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
             </motion.div>
           );
         }
-        // Para los grupos con clases programadas
         return (
           <motion.div
             key={data.name}
@@ -284,10 +193,7 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex space-x-2">
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditGroup(data.name);
-                    }}
+                    onClick={(e) => handleEditGroup(e, data)}
                     className="cursor-pointer text-accent-medium hover:text-white transition-colors"
                     title="Editar grupo"
                   >
@@ -314,7 +220,7 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDeleteGroup(data.name);
+                      handleDeleteGroup(data._id.toString());
                     }}
                     className="cursor-pointer text-primary hover:text-red-500 transition-colors"
                     title="Eliminar grupo"
@@ -349,13 +255,7 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
               </p>
               <div className="flex justify-center mt-2">
                 <button
-                  onClick={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      groupId: data.name,
-                    }));
-                    setIsCreateModalOpen(true);
-                  }}
+                  onClick={(e) => handleEditGroup(e, data)}
                   className="cursor-pointer bg-accent-dark/30 hover:bg-accent-dark/50 text-white text-xs font-oswald px-3 py-1 rounded-full transition-colors duration-200 border border-accent-dark/20 flex items-center"
                 >
                   <svg
@@ -375,16 +275,13 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
               </div>
             </div>
             <div className="p-5">
-              {data.class.map((timeSlot, index) => (
+              {data.classes.map((timeSlot, index) => (
                 <div
                   key={`${data.name}-${index}`}
                   className="mb-4 pb-4 border-b border-accent-dark/30 last:border-0 last:mb-0 last:pb-0"
                 >
-                  <div className="flex items-center mb-1">
-                    <span className="font-oswald text-white text-lg">
-                      {timeSlot.class}
-                    </span>
-                    {data.name}
+                  <div className="flex items-center mb-1 text-white">
+                    {timeSlot.class.name}
                     <div className="ml-auto flex items-center gap-2">
                       <svg
                         width="14"
@@ -409,18 +306,18 @@ const SchedulesClassComponent: FC<SchedulesClassComponentProps> = ({
                         />
                       </svg>
                       <span className="font-montserrat text-accent-medium text-sm">
-                        {timeSlot.start} - {timeSlot.end}
+                        {timeSlot.startTime} - {timeSlot.endTime}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <div className={` px-3 py-1 rounded-full`}>
                       <span className="text-white font-oswald text-xs">
-                        data-aqui
+                        {timeSlot.class.description}
                       </span>
                     </div>
                     <span className="text-accent-medium font-montserrat text-xs">
-                      {timeSlot.description}
+                      {timeSlot.class.difficulty}
                     </span>
                   </div>
                 </div>

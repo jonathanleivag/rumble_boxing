@@ -1,56 +1,42 @@
 'use client";';
 
-import { ModalSchedulesClassComponentProps } from "@/type";
+import {
+  Classes,
+  CreateSchedule,
+  GroupFormData,
+  ModalSchedulesClassComponentProps,
+  Schedules,
+  TimeInputRefs,
+} from "@/type";
 import { motion } from "framer-motion";
-import { ChangeEvent, FC, FormEvent, useState } from "react";
+import { ChangeEvent, FC, FormEvent, useState, useRef } from "react";
 import toast from "react-hot-toast";
-import { useAppSelector } from "@/lib/redux/hooks";
-
-interface ClassSchedule {
-  startTime: string;
-  endTime: string;
-}
-
-interface GroupFormData {
-  name: string;
-  description: string;
-  color: string;
-  selectedClasses: string[];
-  classSchedules: Record<string, ClassSchedule>; // Mapa de ID de clase a horario
-}
-
-interface ClassWithSchedule {
-  classId: string;
-  startTime: string;
-  endTime: string;
-}
-
-interface ClassGroup {
-  id: string;
-  name: string;
-  description: string;
-  color: string;
-  classes: ClassWithSchedule[];
-}
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import {
+  createSchedule,
+  updateSchedule,
+} from "@/lib/db/actions/schedules.action";
+import {
+  addSchedule,
+  editSchedule,
+  isEditSchedule,
+} from "@/lib/redux/features/schedule/schedule.slice";
 
 const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
   setIsGroupModalOpen,
+  setGroupFormData,
+  groupFormData,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [groupFormData, setGroupFormData] = useState<GroupFormData>({
-    name: "",
-    description: "",
-    color: "#E02020", // Rojo por defecto (primary)
-    selectedClasses: [],
-    classSchedules: {},
-  });
-
-  // Obtener las clases del estado global
   const classData = useAppSelector((state) => state.class.class);
-
   const [groupFormErrors, setGroupFormErrors] = useState<
     Partial<Record<keyof GroupFormData, string>>
   >({});
+  const timeInputRefs = useRef<TimeInputRefs>({});
+  const isEdit = useAppSelector((state) => state.schedule.edit);
+  const name = useAppSelector((state) => state.schedule.nameEdit);
+  const id = useAppSelector((state) => state.schedule.idEdit);
+  const dispatch = useAppDispatch();
 
   const handleGroupInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -62,7 +48,6 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
       [name]: value,
     }));
 
-    // Limpiar el error de este campo si existe
     if (groupFormErrors[name as keyof GroupFormData]) {
       setGroupFormErrors((prev) => ({
         ...prev,
@@ -74,7 +59,6 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
   const validateGroupForm = (): boolean => {
     const errors: Partial<Record<keyof GroupFormData, string>> = {};
 
-    // Validar campos obligatorios
     if (!groupFormData.name.trim()) errors.name = "El nombre es obligatorio";
 
     if (!groupFormData.description.trim())
@@ -82,10 +66,6 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
 
     if (!groupFormData.color.trim() || !groupFormData.color.startsWith("#"))
       errors.color = "Selecciona un color válido";
-
-    // Validar selección de al menos una clase
-    if (groupFormData.selectedClasses.length === 0)
-      errors.selectedClasses = "Debes seleccionar al menos una clase";
 
     setGroupFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -102,46 +82,64 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
     setIsSubmitting(true);
 
     try {
-      // Simulación de envío a API (aquí se conectaría con la API real)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const classesWithSchedules: Classes[] = groupFormData.selectedClasses.map(
+        (selectedClassId) => {
+          const selectedClass = classData.find(
+            (c) => c._id.toString() === selectedClassId
+          );
 
-      // Generar un nuevo ID único
-      const newGroupId = `group-${Date.now()}`;
+          const startTime =
+            groupFormData.classSchedules[selectedClassId]?.startTime || "08:00";
 
-      // Convertir los horarios de clases al formato deseado
-      const classesWithSchedules: ClassWithSchedule[] =
-        groupFormData.selectedClasses.map((classId) => ({
-          classId,
-          startTime:
-            groupFormData.classSchedules[classId]?.startTime || "08:00",
-          endTime: groupFormData.classSchedules[classId]?.endTime || "09:00",
-        }));
+          // Asegurarse de convertir todo a valores simples
+          const classId = selectedClass!._id.toString();
+          const endTime = calculateEndTime(
+            startTime,
+            selectedClass?.duration || 0
+          );
 
-      // Crear el nuevo grupo
-      const newGroup: ClassGroup = {
-        id: newGroupId,
+          return {
+            class: {
+              _id: classId,
+              name: selectedClass!.name,
+              duration: selectedClass!.duration,
+              difficulty: selectedClass!.difficulty,
+              description: selectedClass!.description,
+              createdAt: String(selectedClass!.createdAt),
+              updatedAt: String(selectedClass!.updatedAt),
+            },
+            startTime,
+            endTime,
+          };
+        }
+      );
+
+      const newGroup: Schedules = {
         name: groupFormData.name,
         description: groupFormData.description,
         color: groupFormData.color,
         classes: classesWithSchedules,
       };
 
-      // Actualizar la lista de grupos
-      console.log(`Agregando grupo: ${newGroup.name}`);
-      console.log("Detalles del grupo:", newGroup);
-      console.log(classesWithSchedules);
+      let data: CreateSchedule;
 
-      // Éxito
+      if (!isEdit) {
+        data = await createSchedule(newGroup);
+        dispatch(addSchedule(data));
+      } else {
+        data = await updateSchedule(id, newGroup);
+        dispatch(editSchedule(data));
+      }
+
       toast.success(
         <div className="font-montserrat">
           <strong className="block font-oswald text-white">
-            ¡Grupo creado!
+            ¡Grupo {isEdit ? "actualizado" : "creado"}!
           </strong>
           <span className="text-xs">{groupFormData.name}</span>
         </div>
       );
 
-      // Cerrar modal y limpiar formulario
       setIsGroupModalOpen(false);
       setGroupFormData({
         name: "",
@@ -151,7 +149,6 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
         classSchedules: {},
       });
     } catch (e) {
-      // Error
       console.error("Error al crear el grupo:", e);
       toast.error(
         <div className="font-montserrat">
@@ -168,6 +165,57 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
     }
   };
 
+  const calculateEndTime = (
+    startTime: string,
+    durationMinutes: number
+  ): string => {
+    const [hours, minutes] = startTime.split(":").map(Number);
+
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+
+    date.setMinutes(date.getMinutes() + durationMinutes);
+
+    const endHours = date.getHours().toString().padStart(2, "0");
+    const endMinutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${endHours}:${endMinutes}`;
+  };
+
+  const showTimePicker = (classId: string) => {
+    const inputElement = timeInputRefs.current[classId];
+
+    if (inputElement) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const input = inputElement as any;
+        if (typeof input.showPicker === "function") {
+          input.showPicker();
+        } else {
+          inputElement.focus();
+        }
+      } catch (error) {
+        console.log(
+          "Error al mostrar el selector de hora, usando fallback:",
+          error
+        );
+        inputElement.focus();
+      }
+    }
+  };
+
+  const handleCloseModal = () => {
+    setGroupFormData({
+      name: "",
+      description: "",
+      color: "#E02020",
+      selectedClasses: [],
+      classSchedules: {},
+    });
+    dispatch(isEditSchedule({ name: "", isEdit: false, id: "" }));
+    setIsGroupModalOpen(false);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <motion.div
@@ -178,7 +226,7 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="font-oswald text-white text-2xl">
-              Crear Nuevo Grupo de Clases
+              {isEdit ? `Editar ${name}` : "Crear Nuevo Grupo de Clases"}
             </h2>
             <p className="text-accent-medium font-montserrat text-xs mt-1">
               Los grupos te permiten organizar tus clases por categorías o
@@ -186,7 +234,7 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
             </p>
           </div>
           <button
-            onClick={() => setIsGroupModalOpen(false)}
+            onClick={handleCloseModal}
             className="cursor-pointer text-accent-medium hover:text-white transition-colors p-1"
           >
             <svg
@@ -319,12 +367,10 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
                                 ...groupFormData.classSchedules,
                                 [classId]: {
                                   startTime: "08:00", // Hora de inicio por defecto
-                                  endTime: "09:00", // Hora de fin por defecto
                                 },
                               },
                             });
                           } else {
-                            // Cuando se deselecciona una clase, eliminar su horario
                             const updatedSchedules = {
                               ...groupFormData.classSchedules,
                             };
@@ -510,47 +556,25 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
                             </div>
 
                             {/* Selección de horario para la clase */}
-                            <div className="grid grid-cols-2 gap-2 mt-1 pt-2 border-t border-accent-dark/30">
-                              <div>
+                            <div className="flex flex-col mt-1 pt-2 border-t border-accent-dark/30">
+                              <div className="mb-2">
                                 <label className="block text-accent-medium font-montserrat text-xs mb-1">
                                   Hora inicio
                                 </label>
                                 <input
+                                  ref={(el) => {
+                                    timeInputRefs.current[
+                                      selectedClass._id.toString()
+                                    ] = el;
+                                  }}
                                   type="time"
                                   value={
                                     groupFormData.classSchedules[
                                       selectedClass._id.toString()
                                     ]?.startTime || "08:00"
                                   }
-                                  onChange={(e) => {
-                                    const classId =
-                                      selectedClass._id.toString();
-                                    setGroupFormData({
-                                      ...groupFormData,
-                                      classSchedules: {
-                                        ...groupFormData.classSchedules,
-                                        [classId]: {
-                                          ...groupFormData.classSchedules[
-                                            classId
-                                          ],
-                                          startTime: e.target.value,
-                                        },
-                                      },
-                                    });
-                                  }}
-                                  className="w-full bg-accent-dark/60 border border-accent-dark/50 text-white rounded-md p-1 text-xs font-montserrat focus:outline-none focus:ring-1 focus:ring-primary"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-accent-medium font-montserrat text-xs mb-1">
-                                  Hora fin
-                                </label>
-                                <input
-                                  type="time"
-                                  value={
-                                    groupFormData.classSchedules[
-                                      selectedClass._id.toString()
-                                    ]?.endTime || "09:00"
+                                  onClick={() =>
+                                    showTimePicker(selectedClass._id.toString())
                                   }
                                   onChange={(e) => {
                                     const classId =
@@ -560,16 +584,31 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
                                       classSchedules: {
                                         ...groupFormData.classSchedules,
                                         [classId]: {
-                                          ...groupFormData.classSchedules[
-                                            classId
-                                          ],
-                                          endTime: e.target.value,
+                                          startTime: e.target.value,
                                         },
                                       },
                                     });
                                   }}
-                                  className="w-full bg-accent-dark/60 border border-accent-dark/50 text-white rounded-md p-1 text-xs font-montserrat focus:outline-none focus:ring-1 focus:ring-primary"
+                                  className="w-full bg-accent-dark/60 border border-accent-dark/50 text-white rounded-md p-1 text-xs font-montserrat focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
                                 />
+                              </div>
+                              <div>
+                                <div className="flex justify-between">
+                                  <label className="block text-accent-medium font-montserrat text-xs mb-1">
+                                    Hora fin (calculada)
+                                  </label>
+                                  <span className="text-primary text-xs font-montserrat">
+                                    {selectedClass.duration} min
+                                  </span>
+                                </div>
+                                <div className="bg-accent-dark/60 border border-accent-dark/50 text-white rounded-md p-1 text-xs font-montserrat">
+                                  {calculateEndTime(
+                                    groupFormData.classSchedules[
+                                      selectedClass._id.toString()
+                                    ]?.startTime || "08:00",
+                                    selectedClass.duration
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -589,7 +628,7 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-accent-dark/30">
             <button
               type="button"
-              onClick={() => setIsGroupModalOpen(false)}
+              onClick={handleCloseModal}
               className="cursor-pointer bg-accent-dark/60 hover:bg-accent-dark/80 text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300"
             >
               Cancelar
@@ -599,8 +638,8 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
               disabled={isSubmitting}
               className={`cursor-pointer ${
                 isSubmitting
-                  ? "bg-secondary/70 cursor-not-allowed"
-                  : "bg-secondary hover:bg-secondary/80"
+                  ? "bg-primary/70 cursor-not-allowed"
+                  : "bg-primary hover:bg-primary/80"
               } text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 flex items-center justify-center min-w-[140px]`}
             >
               {isSubmitting ? (
@@ -625,7 +664,7 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Creando grupo...</span>
+                  <span> {isEdit ? "Editando" : "Creando"} grupo...</span>
                 </>
               ) : (
                 <>
@@ -643,7 +682,7 @@ const ModalSchedulesClassComponent: FC<ModalSchedulesClassComponentProps> = ({
                       d="M12 4.5v15m7.5-7.5h-15"
                     />
                   </svg>
-                  <span>Crear Grupo</span>
+                  <span>{isEdit ? "Editar" : "Crear"} Grupo</span>
                 </>
               )}
             </button>

@@ -10,6 +10,7 @@ import { CardTypeComponentProps, ClassDocumentData, Difficulty } from "@/type";
 import { showConfirmToast } from "@/utils/showConfirmToast";
 import { motion } from "framer-motion";
 import { FC } from "react";
+import toast from "react-hot-toast";
 
 const CardTypeComponent: FC<CardTypeComponentProps> = ({
   classData,
@@ -52,6 +53,7 @@ const CardTypeComponent: FC<CardTypeComponentProps> = ({
       onConfirm: async () => {
         const data = await deleteClass(id);
         dispatch(deleteClassSlice(data));
+        toast.success("Clase eliminado correctamente");
       },
     });
   };
