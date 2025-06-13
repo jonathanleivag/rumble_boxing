@@ -66,7 +66,14 @@ const CardTypeComponent: FC<CardTypeComponentProps> = ({
       difficulty: edit.difficulty,
       description: edit.description,
     });
-    dispatch(selectEditClass(edit));
+    dispatch(
+      selectEditClass({
+        ...edit,
+        _id: edit._id.toString(),
+        createdAt: new Date(edit.createdAt).toISOString(),
+        updatedAt: new Date(edit.updatedAt).toISOString(),
+      })
+    );
     setIsCreateModalOpen(true);
   };
 

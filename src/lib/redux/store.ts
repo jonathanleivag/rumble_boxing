@@ -11,6 +11,13 @@ export const store = configureStore({
     class: ClassReducer,
     schedule: ScheduleReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["class/selectEditClass"],
+        ignoredPaths: ["class.class"],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
