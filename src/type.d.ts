@@ -1,6 +1,5 @@
 import { ReactNode, Dispatch, SetStateAction } from "react";
 import { Document, Types, PaginateResult } from "mongoose";
-import { countStatusComments } from "./lib/db/actions/comment.action";
 
 export interface ChildrenProps {
   children: ReactNode;
@@ -27,7 +26,7 @@ export interface CommentModalProps {
 }
 
 export interface IData {
-  _id: Types.ObjectId;
+  _id: Types.ObjectId | string;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +54,18 @@ export interface ICommentSlice {
 
 export interface IStudentSlice {
   students: PaginateResult<IStudentData>;
+}
+
+export interface IClassSlice {
+  class: ClassDocumentData[];
+  edit: ClassDocumentData | false;
+}
+
+export interface IScheduleSlice {
+  schedules: ISchedulesData[];
+  edit: boolean;
+  nameEdit: string;
+  idEdit: string;
 }
 
 export interface ICommentDocument extends ICommentData, Document {}
@@ -190,4 +201,104 @@ export interface CountStatusComments {
   approved: number;
   pending: number;
   rejected: number;
+}
+
+export interface ButtonClassComponentProps {
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
+  countClass: number;
+  countGroup: number;
+  totalClasses: number;
+}
+
+export type Difficulty = "essential" | "intermediate" | "advanced";
+
+export interface ClassFormData {
+  name: string;
+  duration: number;
+  difficulty: Difficulty;
+  description: string;
+}
+
+export interface IClassDocument extends ClassFormData, Document {}
+
+export interface ClassDocumentData extends IData, ClassFormData {}
+
+export interface Classes {
+  class: {
+    _id: Types.ObjectId | string;
+    name: string;
+    duration: number;
+    difficulty: Difficulty;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  startTime: string;
+  endTime: string;
+}
+export interface Schedules {
+  name: string;
+  description: string;
+  color: string;
+  classes: Classes[];
+}
+
+export interface ISchedulesDocument extends Schedules, Document {}
+export interface ISchedulesData extends IData, Schedules {}
+
+export type CreateSchedule = Omit<ISchedulesData, "_id"> & { _id: string };
+
+export interface SchedulesClassComponentProps {
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  setFormData: Dispatch<SetStateAction<GroupFormData>>;
+}
+
+export interface ModalClassComponentProps {
+  setFormData: Dispatch<SetStateAction<ClassFormData>>;
+  formData: ClassFormData;
+  formErrors: Partial<Record<keyof ClassFormData, string>>;
+  setFormErrors: Dispatch<
+    SetStateAction<Partial<Record<keyof ClassFormData, string>>>
+  >;
+}
+
+export interface ModalCreateClassComponentProps
+  extends ModalClassComponentProps {
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+}
+
+export interface ModalSchedulesClassComponentProps {
+  setIsGroupModalOpen: Dispatch<SetStateAction<boolean>>;
+  setGroupFormData: Dispatch<SetStateAction<GroupFormData>>;
+  groupFormData: GroupFormData;
+}
+
+export interface CardTypeComponentProps {
+  classData: ClassDocumentData;
+  index: number;
+  setIsCreateModalOpen: Dispatch<SetStateAction<boolean>>;
+  setFormData: Dispatch<SetStateAction<ClassFormData>>;
+}
+
+export interface ConfirmOptions {
+  message: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
+}
+
+export interface ClassSchedule {
+  startTime: string;
+}
+
+export interface TimeInputRefs {
+  [classId: string]: HTMLInputElement | null;
+}
+
+export interface GroupFormData {
+  name: string;
+  description: string;
+  color: string;
+  selectedClasses: string[];
+  classSchedules: Record<string, ClassSchedule>;
 }

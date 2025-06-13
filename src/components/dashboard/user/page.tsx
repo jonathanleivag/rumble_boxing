@@ -64,7 +64,6 @@ const UserPageComponent: FC = () => {
 
       if (sortBy && sortBy.trim() !== "") {
         filter.sortBy = sortBy;
-        console.log("Sorting by:", sortBy);
       }
 
       const data = await getAllStudents(currentPage, 7, filter);
@@ -76,8 +75,6 @@ const UserPageComponent: FC = () => {
   }, [dispatch, currentPage, searchTerm, filterPlan, filterEstado, sortBy]);
 
   const openUserModal = (user: IStudentData) => {
-    console.log("Opening user modal for:", user);
-
     setUsuarioEditado({ ...user });
     setShowModal(true);
   };

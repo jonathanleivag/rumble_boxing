@@ -1,0 +1,53 @@
+"use server";
+
+import mongoose, { Schema } from "mongoose";
+import { ISchedulesDocument } from "@/type";
+
+const schedulesSchema = new Schema<ISchedulesDocument>(
+  {
+    name: {
+      type: String,
+      required: [true, "El nombre del horario es obligatorio"],
+      trim: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    color: {
+      type: String,
+      required: [true, "El color del horario es obligatorio"],
+      trim: true,
+    },
+    classes: {
+      type: [
+        {
+          class: {
+            type: Schema.Types.ObjectId,
+            ref: "ClassFormData",
+            required: true,
+          },
+          startTime: {
+            type: String,
+            required: true,
+          },
+          endTime: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+      default: [],
+    },
+  },
+  {
+    timestamps: true,
+    versionKey: false,
+  }
+);
+
+export const Schedules =
+  mongoose.models.Schedules ||
+  mongoose.model<ISchedulesDocument>("Schedules", schedulesSchema);
