@@ -394,7 +394,7 @@ const PricePageComponent: FC = () => {
             name: "",
             type: "mensual",
             price: 0,
-            class: "",
+            class: 12,
             description: "",
             characteristics: [""],
             active: true,

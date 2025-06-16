@@ -5,6 +5,13 @@ import { connectToMongoDB } from "../mongoose";
 import { Student } from "../models/student.model";
 import { getPriceById } from "./price.action";
 import { PaginateResult } from "mongoose";
+import { createAssist, getAssistById } from "./assist.action";
+import { addFinance, getFinanceById } from "./finance.action";
+import { getRemainingDaysToEndOfMonth } from "@/utils/getRemainingDaysToEndOfMonth.util";
+import { calculatePricePerClass } from "@/utils/calculatePricePerClass.util";
+import { calculateProportionalClasses } from "@/utils/calculateProportionalClasses.util";
+import { getEndDateByPlanType } from "@/utils/getEndDateByPlanType.util";
+import { getRemainingDaysToEndOfYear } from "@/utils/getRemainingDaysToEndOfYear.util";
 
 export const crearStudent = async (
   data: IStudentDTO
@@ -21,9 +28,79 @@ export const crearStudent = async (
 
   if (data.avatar === "") delete data.avatar;
 
+  const totalDaysInMonth =
+    plan.type === "personalizado"
+      ? data.personalizedDays === "anual"
+        ? 365
+        : 30
+      : plan.type === "mensual"
+      ? 30
+      : 365;
+
+  const assistId = await createAssist(
+    data.createDate,
+    totalDaysInMonth,
+    data.assistance
+  );
+
+  if (!assistId) {
+    throw new Error("Error al crear la asistencia del estudiante");
+  }
+
+  const assist = await getAssistById(assistId);
+
+  const remainingDays =
+    plan.type === "personalizado"
+      ? data.personalizedDays === "anual"
+        ? getRemainingDaysToEndOfYear(data.createDate)
+        : getRemainingDaysToEndOfMonth(data.createDate)
+      : plan.type === "mensual"
+      ? getRemainingDaysToEndOfMonth(data.createDate)
+      : getRemainingDaysToEndOfYear(data.createDate);
+
+  const totalClassesInMonth =
+    plan.class === "ilimitado" ? totalDaysInMonth : plan.class;
+
+  const daysProportional = calculateProportionalClasses(
+    totalDaysInMonth,
+    totalClassesInMonth,
+    remainingDays
+  );
+
+  const pricePerClass =
+    calculatePricePerClass(
+      plan.type !== "personalizado" ? plan.price : data.price!,
+      totalClassesInMonth
+    ) *
+    (totalClassesInMonth - daysProportional);
+
+  const dateEnd =
+    plan.type === "personalizado"
+      ? data.personalizedDays === "anual"
+        ? getEndDateByPlanType(data.createDate, "anual")
+        : getEndDateByPlanType(data.createDate, "mensual")
+      : plan.type === "mensual"
+      ? getEndDateByPlanType(data.createDate, "mensual")
+      : getEndDateByPlanType(data.createDate, "anual");
+
+  const financeId = await addFinance(
+    data.createDate,
+    dateEnd,
+    pricePerClass,
+    data.description || ""
+  );
+
+  if (!financeId) {
+    throw new Error("Error al crear la finanza del estudiante");
+  }
+
+  const finance = await getFinanceById(financeId);
+
   const newStudent = new Student({
     ...data,
+    assist: [assist],
     plan,
+    finance,
   });
 
   await newStudent.save();
@@ -34,12 +111,46 @@ export const crearStudent = async (
     rut: newStudent.rut,
     phone: newStudent.phone,
     createDate: newStudent.createDate,
-    plan: newStudent.plan,
+    plan: {
+      _id: (newStudent.plan as IPriceData)._id.toString?.(),
+      id: (newStudent.plan as IPriceData)._id.toString?.(),
+      name: (newStudent.plan as IPriceData).name,
+      price: (newStudent.plan as IPriceData).price,
+      type: (newStudent.plan as IPriceData).type,
+      class: (newStudent.plan as IPriceData).class,
+      description: (newStudent.plan as IPriceData).description,
+      characteristics: (newStudent.plan as IPriceData).characteristics,
+      active: (newStudent.plan as IPriceData).active,
+      createdAt:
+        (newStudent.plan as IPriceData).createdAt?.toString?.() ?? null,
+      updatedAt:
+        (newStudent.plan as IPriceData).updatedAt?.toString?.() ?? null,
+      isPopular: (newStudent.plan as IPriceData).isPopular,
+    },
+    assist: newStudent.assist.map((assist) => ({
+      _id: assist._id.toString(),
+      assist: assist.assist,
+      days: assist.days,
+      createdAt: assist.createdAt?.toString() ?? null,
+      updatedAt: assist.updatedAt?.toString() ?? null,
+    })),
+    finance: {
+      _id: newStudent.finance._id.toString(),
+      dateStart: newStudent.finance.dateStart,
+      dateEnd: newStudent.finance.dateEnd,
+      price: newStudent.finance.price,
+      matricula: newStudent.finance.matricula,
+      total: newStudent.finance.total,
+      status: newStudent.finance.status,
+      description: newStudent.finance.description,
+      createdAt: newStudent.finance.createdAt?.toString() ?? null,
+      updatedAt: newStudent.finance.updatedAt?.toString() ?? null,
+    },
     assistance: newStudent.assistance,
     updateAssistance: newStudent.updateAssistance,
     status: newStudent.status,
     avatar: newStudent.avatar,
-    _id: newStudent._id,
+    _id: newStudent._id.toString(),
     createdAt: newStudent.createdAt?.toString?.() ?? null,
     updatedAt: newStudent.updatedAt?.toString?.() ?? null,
   };
@@ -80,7 +191,7 @@ export const getAllStudents = async (
   const students = await Student.paginate(filter, {
     page,
     limit,
-    populate: "plan",
+    populate: [{ path: "plan" }, { path: "assist" }, { path: "finance" }],
     sort: { [sortField]: sortOrder },
   });
 
@@ -109,6 +220,24 @@ export const getAllStudents = async (
         }
       : null,
     assistance: student.assistance,
+    assist: student.assist.map((assist) => ({
+      _id: assist._id.toString(),
+      assist: assist.assist,
+      days: assist.days,
+      createdAt: assist.createdAt?.toString() ?? null,
+      updatedAt: assist.updatedAt?.toString() ?? null,
+    })),
+    finance: student.finance
+      ? {
+          _id: student.finance._id.toString(),
+          dateStart: student.finance.dateStart,
+          dateEnd: student.finance.dateEnd,
+          price: student.finance.price,
+          description: student.finance.description,
+          createdAt: student.finance.createdAt?.toString() ?? null,
+          updatedAt: student.finance.updatedAt?.toString() ?? null,
+        }
+      : null,
     status: student.status,
     avatar: student.avatar,
     createdAt: student.createdAt?.toString?.() ?? null,
@@ -132,12 +261,14 @@ export const updateStudent = async (
   }
 
   const plan = await getPriceById(data.plan!.toString());
+  const finance = await getFinanceById(student.finance._id.toString());
 
   const updateStudent = await Student.findByIdAndUpdate(
     id,
     {
       ...data,
       plan,
+      finance,
     },
     { new: true, runValidators: true }
   );
@@ -146,7 +277,10 @@ export const updateStudent = async (
     throw new Error("Error al actualizar el estudiante");
   }
 
-  const studentData = await Student.findById(updateStudent.id).populate("plan");
+  const studentData = await Student.findById(updateStudent.id)
+    .populate("plan")
+    .populate("assist")
+    .populate("finance");
 
   if (!studentData) {
     throw new Error("Estudiante no encontrado después de la actualización");
@@ -175,7 +309,25 @@ export const updateStudent = async (
         (studentData.plan as IPriceData).updatedAt?.toString?.() ?? null,
       isPopular: (studentData.plan as IPriceData).isPopular,
     },
+    assist: studentData.assist.map((assist) => ({
+      _id: assist._id.toString(),
+      assist: assist.assist,
+      days: assist.days,
+      createdAt: assist.createdAt?.toString() ?? null,
+      updatedAt: assist.updatedAt?.toString() ?? null,
+    })),
+    finance: {
+      _id: studentData.finance?._id.toString() ?? "",
+      dateStart: studentData.finance?.dateStart ?? "",
+      dateEnd: studentData.finance?.dateEnd ?? "",
+      price: studentData.finance?.price ?? 0,
+      status: studentData.finance?.status ?? "pending",
+      description: studentData.finance?.description ?? "",
+      createdAt: studentData.finance?.createdAt?.toString() ?? null,
+      updatedAt: studentData.finance?.updatedAt?.toString() ?? null,
+    },
     assistance: studentData.assistance,
+    updateAssistance: studentData.updateAssistance,
     status: studentData.status,
     avatar: studentData.avatar,
     createdAt: studentData.createdAt?.toString?.() ?? null,

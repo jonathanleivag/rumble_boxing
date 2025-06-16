@@ -1,7 +1,13 @@
 "use client";
 
 import { crearStudent } from "@/lib/db/actions/student.action";
-import { FormUserComponentProps, IStudent } from "@/type";
+import {
+  FormUserComponentProps,
+  IIStudentFrontDTO,
+  IStudent,
+  IStudentDTO,
+  planTypePersonalizado,
+} from "@/type";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, useState, useRef, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -15,7 +21,7 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
   setShowAddForm,
   planes,
 }) => {
-  type FormValues = Omit<IStudent, "id">;
+  type FormValues = Omit<IIStudentFrontDTO, "id">;
 
   const {
     isUploading,
@@ -68,7 +74,7 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
       phone: "",
       rut: "",
       plan: planes[0],
-      createDate: new Date().toISOString().split("T")[0], // Formato YYYY-MM-DD para input date
+      createDate: new Date().toISOString().split("T")[0],
       assistance: 0,
       status: "activo",
       avatar: "",
@@ -138,6 +144,9 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
         phone: data.phone,
         rut: data.rut,
         plan: data.plan._id,
+        price: data.price || data.plan.price,
+        personalizedDays: data.personalizedDays || data.plan.type,
+        description: data.description || data.plan.type,
         createDate: createDateISO,
         assistance: data.assistance,
         status: data.status,
@@ -365,7 +374,6 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                       }}
                       onBlur={() => dateInputRef.current?.blur()}
                     />
-                    {/* Icono de calendario */}
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                       <div className="bg-gradient-to-r from-primary to-primary-dark rounded-full p-1.5 shadow-md">
                         <svg
@@ -493,6 +501,92 @@ const FormUserComponent: FC<FormUserComponentProps> = ({
                     </p>
                   )}
                 </div>
+
+                {watchPlan.type === "personalizado" && (
+                  <>
+                    <div>
+                      <label
+                        htmlFor="price"
+                        className="block text-accent-medium font-montserrat text-xs mb-1"
+                      >
+                        precio
+                      </label>
+                      <input
+                        id="price"
+                        type="number"
+                        className={`w-full bg-accent-dark/40 rounded-lg border ${
+                          errors.price
+                            ? "border-red-500"
+                            : "border-accent-dark/40"
+                        } text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                        placeholder="Precio personalizado"
+                        {...register("price", {
+                          valueAsNumber: true,
+                          min: {
+                            value: 0,
+                            message: "El precio no puede ser negativo",
+                          },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="class"
+                        className="block text-accent-medium font-montserrat text-xs mb-1"
+                      >
+                        Forma de pago
+                      </label>
+                      <select
+                        id="personalizedDays"
+                        className={`w-full bg-accent-dark/40 rounded-lg border ${
+                          errors.personalizedDays
+                            ? "border-red-500"
+                            : "border-accent-dark/40"
+                        } text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                        value={watch("personalizedDays")}
+                        onChange={(e) => {
+                          setValue(
+                            "personalizedDays",
+                            e.target.value as planTypePersonalizado
+                          );
+                        }}
+                      >
+                        <option value="mensual">Mensual</option>
+                        <option value="anual">Anual</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="description"
+                        className="block text-accent-medium font-montserrat text-xs mb-1"
+                      >
+                        Descripción
+                      </label>
+                      <textarea
+                        id="description"
+                        className={`w-full bg-accent-dark/40 rounded-lg border ${
+                          errors.description
+                            ? "border-red-500"
+                            : "border-accent-dark/40"
+                        } text-white p-3 font-montserrat text-sm focus:outline-none focus:ring-2 focus:ring-primary/50`}
+                        placeholder="Descripción del plan personalizado"
+                        {...register("description", {
+                          required: "La descripción es obligatoria",
+                          minLength: {
+                            value: 10,
+                            message:
+                              "La descripción debe tener al menos 10 caracteres",
+                          },
+                        })}
+                      ></textarea>
+                      {errors.description && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.description.message}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label

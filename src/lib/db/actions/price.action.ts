@@ -29,10 +29,11 @@ export const createPrice = async (body: IPrice): Promise<IPriceData> => {
     }
   }
 
-  const newPrice = await Price.create(body);
+  const newPrice: IPriceData = await Price.create(body);
 
   return {
-    _id: newPrice._id,
+    _id: newPrice._id.toString(),
+    id: newPrice._id.toString(),
     name: newPrice.name,
     type: newPrice.type,
     price: newPrice.price,
@@ -62,7 +63,7 @@ export const getPrices = async (
     prices = await Price.find();
 
     const serializedPrices = prices.map((price) => ({
-      _id: price._id,
+      _id: price._id.toString(),
       name: price.name,
       description: price.description,
       type: price.type,

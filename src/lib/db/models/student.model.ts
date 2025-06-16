@@ -40,6 +40,17 @@ const StudentSchema = new Schema<IStudentDocument>(
       type: Number,
       default: 0,
     },
+    assist: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Assist",
+      },
+    ],
+    finance: {
+      type: Schema.Types.ObjectId,
+      ref: "Finance",
+      required: [true, "La información financiera es obligatoria"],
+    },
     status: {
       type: String,
       enum: ["activo", "inactivo", "suspendido"],

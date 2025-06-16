@@ -79,6 +79,28 @@ export interface IUser {
 export interface IUserData extends IData, IUser {}
 export interface IUserDocument extends IUserData, Document {}
 
+export interface IAssist {
+  assist: number;
+  days: number | "ilimitado";
+}
+
+export interface IAssistData extends IData, IAssist {}
+export interface IAssistDocument extends IAssistData, Document {}
+
+export type StatusFinance = "pending" | "paid" | "overdue";
+export interface IFinance {
+  price: number;
+  dateStart: string;
+  dateEnd: string;
+  status: StatusFinance;
+  description?: string;
+  matricula: number;
+  total: number;
+}
+
+export interface IFinanceData extends IData, IFinance {}
+export interface IFinanceDocument extends IFinanceData, Document {}
+
 export interface IMatricula {
   value: number;
   description: string;
@@ -87,9 +109,11 @@ export interface IMatricula {
 export interface IMatriculaData extends IData, IMatricula {}
 export interface IMatriculaDocument extends IMatriculaData, Document {}
 
+export type PlanType = "mensual" | "anual" | "personalizado";
+export type planTypePersonalizado = "mensual" | "anual";
 export interface IPrice {
   name: string;
-  type: "mensual" | "anual" | "personalizado";
+  type: PlanType;
   price: number;
   class: number | "ilimitado";
   description: string;
@@ -148,14 +172,24 @@ export interface IStudent {
   createDate: string;
   plan: IPriceData;
   assistance: number;
-  updateAssistance: Date;
+  assist: IAssistData[];
+  finance: IFinanceData;
+  updateAssistance?: Date;
   status: StatusStudent;
   avatar?: string;
 }
 
-export type IStudentDTO = Omit<IStudent, "plan"> & {
-  plan: Types.ObjectId;
+export type IStudentDTO = Omit<IStudent, "plan" | "assist" | "finance"> & {
+  plan: Types.ObjectId | string;
+  price?: number;
+  personalizedDays: planTypePersonalizado;
+  description?: string;
+  assist?: Types.ObjectId[];
+  finance?: Types.ObjectId;
 };
+
+export type IStudentDTOOmit = Omit<IStudentDTO, "plan" | "assist" | "finance">;
+export interface IIStudentFrontDTO extends IStudent, IStudentDTOOmit {}
 
 export interface IStudentData extends IData, IStudent {}
 export interface IStudentDocument extends IStudentData, Document {}

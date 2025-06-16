@@ -38,7 +38,13 @@ export async function createMatricula(
     });
 
     const savedMatricula = await newMatricula.save();
-    return savedMatricula.toObject() as IMatriculaData;
+    return {
+      _id: savedMatricula._id.toString(),
+      value: savedMatricula.value,
+      description: savedMatricula.description,
+      createdAt: savedMatricula.createdAt?.toString() ?? null,
+      updatedAt: savedMatricula.updatedAt?.toString() ?? null,
+    };
   } catch (error) {
     console.error("Error en createMatricula:", error);
     throw new Error("Error al crear el valor de la matrícula");
@@ -48,22 +54,27 @@ export async function createMatricula(
 export async function updateMatricula(
   id: string,
   matriculaData: Partial<IMatriculaData>
-): Promise<IMatriculaData | null> {
-  try {
-    await connectToMongoDB();
+): Promise<IMatriculaData> {
+  await connectToMongoDB();
 
-    const updatedMatricula = await Matricula.findByIdAndUpdate(
-      id,
-      {
-        value: matriculaData.value,
-        description: matriculaData.description,
-      },
-      { new: true, runValidators: true }
-    ).lean();
+  await Matricula.findByIdAndUpdate(
+    id,
+    {
+      value: matriculaData.value,
+      description: matriculaData.description,
+    },
+    { new: true, runValidators: true }
+  ).lean();
 
-    return updatedMatricula as unknown as IMatriculaData;
-  } catch (error) {
-    console.error("Error en updateMatricula:", error);
-    throw new Error("Error al actualizar el valor de la matrícula");
-  }
+  const matricula: IMatriculaData = (await Matricula.findById(
+    id
+  )) as IMatriculaData;
+
+  return {
+    _id: matricula._id.toString(),
+    value: matricula.value,
+    description: matricula.description,
+    createdAt: matricula.createdAt?.toString() ?? null,
+    updatedAt: matricula.updatedAt?.toString() ?? null,
+  };
 }
