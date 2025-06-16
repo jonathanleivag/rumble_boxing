@@ -1,6 +1,7 @@
 "use client";
 
 import { IPrice, PriceFormModalProps } from "@/type";
+import { parseSmartValue } from "@/utils/parseSmartValue.util";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, useEffect, useState } from "react";
 
@@ -14,7 +15,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
     name: "",
     type: "mensual",
     price: 0,
-    class: "",
+    class: 12,
     description: "",
     characteristics: [""],
     active: true,
@@ -36,10 +37,34 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
     >
   ) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    if (name === "class") {
+      setFormData((prev) => ({
+        ...prev,
+        class: parseSmartValue(value),
+      }));
+    }
+
+    if (name === "type" && value === "anual") {
+      setFormData((prev) => ({
+        ...prev,
+        price: 0,
+        class: "ilimitado",
+      }));
+    }
+
+    if (name === "type" && value === "mensual") {
+      setFormData((prev) => ({
+        ...prev,
+        price: 0,
+        class: 12,
+      }));
+    }
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +133,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-white text-2xl font-oswald">
-              {initialData ? "Editar Plan" : "Nuevo Plan"}
+              {initialData?.name ? "Editar Plan" : "Nuevo Plan"}
             </h2>
             <button
               onClick={onClose}
@@ -163,35 +188,39 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
                   <option value="personalizado">Personalizado</option>
                 </select>
               </div>
-
-              <div>
-                <label className="block text-accent-medium mb-1 font-montserrat text-sm">
-                  Precio
-                </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleNumberChange}
-                  className="w-full bg-[#0f0f0f] border border-accent-dark/50 rounded-md p-2 text-white focus:border-primary outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-accent-medium mb-1 font-montserrat text-sm">
-                  Clases
-                </label>
-                <input
-                  type="text"
-                  name="class"
-                  value={formData.class}
-                  onChange={handleChange}
-                  required
-                  className="w-full bg-[#0f0f0f] border border-accent-dark/50 rounded-md p-2 text-white focus:border-primary outline-none"
-                />
-                <p className="text-xs text-accent-medium mt-1">
-                  Puede ser un número o texto como &quot;Ilimitadas&quot;
-                </p>
-              </div>
+              {formData.type !== "personalizado" && (
+                <>
+                  <div>
+                    <label className="block text-accent-medium mb-1 font-montserrat text-sm">
+                      Precio
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleNumberChange}
+                      min={0}
+                      className="w-full bg-[#0f0f0f] border border-accent-dark/50 rounded-md p-2 text-white focus:border-primary outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-accent-medium mb-1 font-montserrat text-sm">
+                      Clases
+                    </label>
+                    <input
+                      type="text"
+                      name="class"
+                      value={formData.class}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-[#0f0f0f] border border-accent-dark/50 rounded-md p-2 text-white focus:border-primary outline-none"
+                    />
+                    <p className="text-xs text-accent-medium mt-1">
+                      Puede ser un número o el texto &quot;ilimitado&quot;
+                    </p>
+                  </div>
+                </>
+              )}
 
               <div className="col-span-full">
                 <label className="block text-accent-medium mb-1 font-montserrat text-sm">
@@ -311,7 +340,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
                 type="submit"
                 className="bg-primary hover:bg-primary-dark text-white py-2 px-4 rounded-md text-sm font-oswald uppercase tracking-wider transition-all duration-300 cursor-pointer"
               >
-                {initialData ? "Actualizar" : "Crear"}
+                {initialData?.name ? "Actualizar" : "Crear"}
               </button>
             </div>
           </form>

@@ -3,13 +3,19 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { ModalEditUserComponentProps } from "@/type";
+import { IAssistData, ModalEditUserComponentProps } from "@/type";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { toast } from "react-hot-toast";
 import { updateStudent } from "@/lib/db/actions/student.action";
 import { Types } from "mongoose";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { updateStudent as updateStudentRedux } from "@/lib/redux/features/student/student.slice";
+import { format } from "date-fns";
+import { toChileanPesos } from "@/utils/toChileanPesos.util";
+import {
+  getColorSpanishStatusFinance,
+  getTextSpanishStatusFinance,
+} from "@/utils/getTextSpanishStatusFinance.util";
 
 const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
   setShowModal,
@@ -103,6 +109,7 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
         assistance: formattedUser.assistance,
         status: formattedUser.status,
         avatar: formattedUser.avatar,
+        personalizedDays: "mensual",
       });
 
       dispatch(updateStudentRedux(fetchStudent));
@@ -118,6 +125,12 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const showTheLastAttendance = (assist: IAssistData[]): number => {
+    return assist.reduce((latest, current) =>
+      current.createdAt > latest.createdAt ? current : latest
+    ).assist;
   };
 
   return (
@@ -336,7 +349,7 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                   </select>
                 </div>
 
-                <div>
+                <div className="hidden">
                   <label className="block text-accent-medium font-montserrat text-xs mb-1">
                     Plan
                   </label>
@@ -363,7 +376,7 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                   </select>
                 </div>
 
-                <div>
+                <div className="hidden">
                   <label className="block text-accent-medium font-montserrat text-xs mb-1">
                     Asistencias
                   </label>
@@ -380,7 +393,7 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                   />
                 </div>
 
-                <div>
+                <div className="hidden">
                   <label className="block text-accent-medium font-montserrat text-xs mb-1">
                     Fecha de Creación
                   </label>
@@ -452,13 +465,14 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                 <div className="bg-gradient-to-br from-accent-dark/40 to-accent-dark/20 rounded-lg p-5 shadow-lg border border-accent-dark/40">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-white font-oswald text-lg">
-                      {usuarioEditado.plan.name}
+                      {usuarioEditado.plan.name} - $
+                      {toChileanPesos(usuarioEditado.finance.price)}
                     </span>
                     <span className="bg-gradient-to-r from-primary to-primary-dark text-white text-xs px-3 py-1 rounded-full font-oswald shadow-sm">
                       {usuarioEditado.plan.type.toUpperCase()}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
                     <div className="bg-accent-dark/30 p-3 rounded-lg text-center">
                       <div className="text-accent-medium font-montserrat text-xs mb-1">
                         Total
@@ -472,7 +486,7 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                         Usadas
                       </div>
                       <div className="text-white font-oswald text-lg">
-                        {usuarioEditado.assistance}
+                        {showTheLastAttendance(usuarioEditado.assist)}
                       </div>
                     </div>
                     <div className="bg-accent-dark/30 p-3 rounded-lg text-center">
@@ -485,8 +499,40 @@ const ModalEditUserComponent: FC<ModalEditUserComponentProps> = ({
                           : Math.max(
                               0,
                               Number(usuarioEditado.plan.class) -
-                                usuarioEditado.assistance
+                                showTheLastAttendance(usuarioEditado.assist)
                             )}
+                      </div>
+                    </div>
+                    <div className="bg-accent-dark/30 p-3 rounded-lg text-center">
+                      <div className="text-accent-medium font-montserrat text-xs mb-1">
+                        Fecha de ingreso
+                      </div>
+                      <div className="text-white font-oswald text-lg">
+                        {format(usuarioEditado.createDate, "dd/MM/yyyy")}
+                      </div>
+                    </div>
+                    <div className="bg-accent-dark/30 p-3 rounded-lg text-center">
+                      <div className="text-accent-medium font-montserrat text-xs mb-1">
+                        Finanzas
+                      </div>
+                      <div className="text-white font-oswald text-lg">
+                        <span
+                          className={`${getColorSpanishStatusFinance(
+                            usuarioEditado.finance.status
+                          )}`}
+                        >
+                          {getTextSpanishStatusFinance(
+                            usuarioEditado.finance.status
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="bg-accent-dark/30 p-3 rounded-lg text-center">
+                      <div className="text-accent-medium font-montserrat text-xs mb-1">
+                        Matricula
+                      </div>
+                      <div className="text-white font-oswald text-lg">
+                        ${toChileanPesos(usuarioEditado.finance.matricula)}
                       </div>
                     </div>
                   </div>

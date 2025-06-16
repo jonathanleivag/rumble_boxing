@@ -55,10 +55,12 @@ const PriceCard: FC<PriceCardProps> = ({
             price.active ? "text-white" : "text-accent-medium"
           }`}
         >
-          ${toChileanPesos(price.price)}{" "}
-          <span className="text-accent-medium text-sm font-montserrat">
-            {price.type}
-          </span>
+          {price.type !== "personalizado" && ` $${toChileanPesos(price.price)}`}{" "}
+          {price.type !== "personalizado" && (
+            <span className="text-accent-medium text-sm font-montserrat">
+              {price.type}
+            </span>
+          )}
         </div>
 
         {matriculaValue > 0 && (
