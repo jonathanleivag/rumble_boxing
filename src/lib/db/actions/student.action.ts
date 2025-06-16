@@ -228,6 +228,8 @@ export const getAllStudents = async (
           dateStart: student.finance.dateStart,
           dateEnd: student.finance.dateEnd,
           price: student.finance.price,
+          status: student.finance.status,
+          matricula: student.finance.matricula,
           description: student.finance.description,
           createdAt: student.finance.createdAt?.toString() ?? null,
           updatedAt: student.finance.updatedAt?.toString() ?? null,
