@@ -37,18 +37,6 @@ export const crearStudent = async (
       ? 30
       : 365;
 
-  const assistId = await createAssist(
-    data.createDate,
-    totalDaysInMonth,
-    data.assistance
-  );
-
-  if (!assistId) {
-    throw new Error("Error al crear la asistencia del estudiante");
-  }
-
-  const assist = await getAssistById(assistId);
-
   const remainingDays =
     plan.type === "personalizado"
       ? data.personalizedDays === "anual"
@@ -67,12 +55,19 @@ export const crearStudent = async (
     remainingDays
   );
 
+  const assistId = await createAssist(daysProportional, data.assistance);
+
+  if (!assistId) {
+    throw new Error("Error al crear la asistencia del estudiante");
+  }
+
+  const assist = await getAssistById(assistId);
+
   const pricePerClass =
     calculatePricePerClass(
       plan.type !== "personalizado" ? plan.price : data.price!,
       totalClassesInMonth
-    ) *
-    (totalClassesInMonth - daysProportional);
+    ) * daysProportional;
 
   const dateEnd =
     plan.type === "personalizado"

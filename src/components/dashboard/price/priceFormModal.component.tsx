@@ -1,6 +1,7 @@
 "use client";
 
 import { IPrice, PriceFormModalProps } from "@/type";
+import { parseSmartValue } from "@/utils/parseSmartValue.util";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, useEffect, useState } from "react";
 
@@ -41,6 +42,13 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
       ...prev,
       [name]: value,
     }));
+
+    if (name === "class") {
+      setFormData((prev) => ({
+        ...prev,
+        class: parseSmartValue(value),
+      }));
+    }
 
     if (name === "type" && value === "anual") {
       setFormData((prev) => ({
@@ -191,6 +199,7 @@ const PriceFormModal: FC<PriceFormModalProps> = ({
                       name="price"
                       value={formData.price}
                       onChange={handleNumberChange}
+                      min={0}
                       className="w-full bg-[#0f0f0f] border border-accent-dark/50 rounded-md p-2 text-white focus:border-primary outline-none"
                     />
                   </div>

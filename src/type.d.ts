@@ -115,7 +115,7 @@ export interface IPrice {
   name: string;
   type: PlanType;
   price: number;
-  class: number | "ilimitado";
+  class: number | string;
   description: string;
   characteristics: string[];
   active: boolean;

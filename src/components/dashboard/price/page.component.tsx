@@ -69,7 +69,8 @@ const PricePageComponent: FC = () => {
       setShowModal(false);
       const dataFetch = await createPrice({
         ...data,
-        class: typeof data.class === "string" ? "ilimitado" : data.class,
+        class:
+          typeof data.class === "string" ? "ilimitado" : Math.abs(data.class),
       });
       setPrice((prev) => [...prev, dataFetch]);
     } catch (error) {
@@ -86,7 +87,11 @@ const PricePageComponent: FC = () => {
     try {
       setShowModal(false);
       const dataFetch = JSON.parse(
-        await putPrice(selectedPrice._id.toString(), data)
+        await putPrice(selectedPrice._id.toString(), {
+          ...data,
+          class:
+            typeof data.class === "string" ? "ilimitado" : Math.abs(data.class),
+        })
       );
       setPrice((prev) =>
         prev.map((price) =>
