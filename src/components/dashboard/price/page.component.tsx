@@ -67,7 +67,10 @@ const PricePageComponent: FC = () => {
   const handleCreatePrice = async (data: IPrice) => {
     try {
       setShowModal(false);
-      const dataFetch = await createPrice(data);
+      const dataFetch = await createPrice({
+        ...data,
+        class: typeof data.class === "string" ? "ilimitado" : data.class,
+      });
       setPrice((prev) => [...prev, dataFetch]);
     } catch (error) {
       if (error instanceof Error) {
