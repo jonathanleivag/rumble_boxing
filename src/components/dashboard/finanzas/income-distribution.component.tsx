@@ -23,7 +23,7 @@ const IncomeDistribution: FC<IncomeDistributionProps> = ({ delay = 0 }) => {
               .replace(/[\u0300-\u036f]/g, "") as keyof typeof data;
             return {
               ...item,
-              percentage: data[key] ?? 0,
+              percentage: data[key],
             };
           })
         );
