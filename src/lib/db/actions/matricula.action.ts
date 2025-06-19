@@ -78,3 +78,8 @@ export async function updateMatricula(
     updatedAt: matricula.updatedAt?.toString() ?? null,
   };
 }
+
+export const getValueMatricula = async (): Promise<number> => {
+  const matricula = await getMatricula();
+  return matricula ? matricula.value : 0;
+};

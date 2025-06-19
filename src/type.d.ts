@@ -336,3 +336,43 @@ export interface GroupFormData {
   selectedClasses: string[];
   classSchedules: Record<string, ClassSchedule>;
 }
+
+export interface ModalFinanceComponentProps {
+  showSuccess: boolean;
+  selectedPlan: Plan | null;
+  setShowSuccess: Dispatch<SetStateAction<boolean>>;
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  setSelectedStudent: Dispatch<SetStateAction<Student | null>>;
+  setSelectedPlan: Dispatch<SetStateAction<Plan | null>>;
+  selectedStudent: Student | null;
+}
+
+export interface ResumeFinance {
+  titulo: string;
+  valor: string;
+  icono: string;
+  color: string;
+}
+
+export interface GetFinance {
+  income: number;
+  totalStudent: number;
+  totalDelinquentStudents: number;
+  valueMatricula: number;
+}
+
+export interface DistributionItem {
+  label: string;
+  percentage: number;
+  color: string;
+}
+
+export interface IncomeDistributionProps {
+  delay?: number;
+}
+
+export interface GetIncomeDistribution {
+  mensualidades: number;
+  anuales: number;
+  personalizadas: number;
+}

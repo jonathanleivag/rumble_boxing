@@ -1,6 +1,12 @@
 "use server";
 
-import { IPriceData, IStudentData, IStudentDTO, StudentQuery } from "@/type";
+import {
+  IPriceData,
+  IStudentData,
+  IStudentDTO,
+  PlanType,
+  StudentQuery,
+} from "@/type";
 import { connectToMongoDB } from "../mongoose";
 import { Student } from "../models/student.model";
 import { getPriceById } from "./price.action";
@@ -12,6 +18,7 @@ import { calculatePricePerClass } from "@/utils/calculatePricePerClass.util";
 import { calculateProportionalClasses } from "@/utils/calculateProportionalClasses.util";
 import { getEndDateByPlanType } from "@/utils/getEndDateByPlanType.util";
 import { getRemainingDaysToEndOfYear } from "@/utils/getRemainingDaysToEndOfYear.util";
+import Finance from "../models/finance.model";
 
 export const crearStudent = async (
   data: IStudentDTO
@@ -46,8 +53,8 @@ export const crearStudent = async (
       ? getRemainingDaysToEndOfMonth(data.createDate)
       : getRemainingDaysToEndOfYear(data.createDate);
 
-  const totalClassesInMonth =
-    plan.class === "ilimitado" ? totalDaysInMonth : plan.class;
+  const totalClassesInMonth: number =
+    plan.class === "ilimitado" ? totalDaysInMonth : +plan.class;
 
   const daysProportional = calculateProportionalClasses(
     totalDaysInMonth,
@@ -318,6 +325,8 @@ export const updateStudent = async (
       dateStart: studentData.finance?.dateStart ?? "",
       dateEnd: studentData.finance?.dateEnd ?? "",
       price: studentData.finance?.price ?? 0,
+      matricula: studentData.finance?.matricula ?? 0,
+      total: studentData.finance?.total ?? 0,
       status: studentData.finance?.status ?? "pending",
       description: studentData.finance?.description ?? "",
       createdAt: studentData.finance?.createdAt?.toString() ?? null,
@@ -330,4 +339,49 @@ export const updateStudent = async (
     createdAt: studentData.createdAt?.toString?.() ?? null,
     updatedAt: studentData.updatedAt?.toString?.() ?? null,
   };
+};
+
+export const getTotalStudents = async (): Promise<number> => {
+  await connectToMongoDB();
+  return await Student.countDocuments();
+};
+
+export const getTotalDelinquentStudents = async (): Promise<number> => {
+  await connectToMongoDB();
+  const student = await Student.find().populate("finance");
+  return student.filter((item) => item.finance.status === "pending").length;
+};
+
+export const getTotalPaidStudents = async (): Promise<number> => {
+  await connectToMongoDB();
+  const student = await Student.find().populate("finance");
+  return student.filter((item) => item.finance.status === "paid").length;
+};
+
+export const getTotalStudentsPaidByPlan = async (
+  plan: PlanType
+): Promise<number> => {
+  await connectToMongoDB();
+  const students = await Student.find().populate("plan").populate("finance");
+
+  switch (plan) {
+    case "mensual":
+      return students.filter(
+        (student) =>
+          student.plan.type === "mensual" && student.finance.status === "paid"
+      ).length;
+    case "anual":
+      return students.filter(
+        (student) =>
+          student.plan.type === "anual" && student.finance.status === "paid"
+      ).length;
+    case "personalizado":
+      return students.filter(
+        (student) =>
+          student.plan.type === "personalizado" &&
+          student.finance.status === "paid"
+      ).length;
+    default:
+      return 0;
+  }
 };
