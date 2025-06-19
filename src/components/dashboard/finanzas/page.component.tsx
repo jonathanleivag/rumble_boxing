@@ -113,13 +113,13 @@ const FinancePageComponent: FC = () => {
         </div>
       </motion.div>
 
+      <StudentPaymentSection delay={0.6} />
+
       <ChangePlanSection
-        delay={0.6}
+        delay={0.7}
         setShowModal={setShowModal}
         setSelectedStudent={setSelectedStudent}
       />
-
-      <StudentPaymentSection delay={0.7} />
 
       {showModal && (
         <ModalFinanceComponent
